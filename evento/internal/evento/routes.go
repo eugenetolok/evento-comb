@@ -31,6 +31,7 @@ func Routes(e *echo.Echo) {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid or expired JWT")
 		},
 	}
+	e.GET("/api/settings/frontend", frontendConfig)
 	e.POST("/api/auth", authUser)
 	// Restricted group
 	// r := e.Group("/api/users", utils.RoleMiddleware([]string{"admin", "editor"}))
@@ -43,7 +44,7 @@ func Routes(e *echo.Echo) {
 	gate.InitGates(e.Group("/api/gates"), db, jwtConfig)
 	badge.InitBadges(e.Group("/api/badges"), db, jwtConfig)
 	event.InitEvents(e.Group("/api/events"), db, jwtConfig)
-	report.InitReports(e.Group("/api/reports"), db, jwtConfig)
+	report.InitReports(e.Group("/api/reports"), db, jwtConfig, appSettings.ReportSettings.Dashboard)
 	company.InitCompanies(e.Group("/api/companies"), db, jwtConfig)
 	member.InitMembers(e.Group("/api/members"), db, jwtConfig, photoStorageDir)
 	accreditation.InitAccreditations(e.Group("/api/accreditations"), db, jwtConfig)

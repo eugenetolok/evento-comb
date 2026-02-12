@@ -1,0 +1,84 @@
+site_settings:
+  db_path: test.db
+  debug: false
+  admin_token: ""
+  secret_jwt: change-me
+  photo_storage_path: photos
+
+mail_settings:
+  from_name: VK FEST
+  from: noreply@example.com
+  smtp: smtp.example.com
+  port: 587
+  user: user@example.com
+  password: change-me
+  domain: example.com
+  city: msk
+
+frontend_settings:
+  name: VK FEST
+  year: "2026"
+  description: Регистрация участников VK FEST
+  version: "0.4.7"
+  city: Москва
+  cities:
+    spb: Санкт-Петербург
+    msk: Москва
+    clb: Челябинск
+    sir: Сириус (Сочи)
+    kzn: Казань
+    "": "2026"
+  docs:
+    spb: https://vkfestreg.ru
+    msk: https://vkfestreg.ru
+    clb: https://vkfestreg.ru
+    sir: https://vkfestreg.ru
+    kzn: https://vkfestreg.ru
+    "": https://vkfestreg.ru
+  nav_items:
+    admin:
+      - label: Главная
+        href: /dashboard
+      - label: Компании
+        href: /dashboard/companies/admin
+      - label: Участники
+        href: /dashboard/members/admin
+      - label: Автомобили
+        href: /dashboard/autos/admin
+      - label: Администрирование
+        href: /dashboard/admin/main
+    editor:
+      - label: Главная
+        href: /dashboard
+      - label: Мои компании
+        href: /dashboard/companies/editor
+      - label: Мои участники
+        href: /dashboard/members/editor
+      - label: Мои автомобили
+        href: /dashboard/autos/editor
+    company:
+      - label: Мои участники
+        href: /dashboard/members/company
+      - label: Мои автомобили
+        href: /dashboard/autos/company
+    operator:
+      - label: Участники
+        href: /dashboard/members/operator
+      - label: Автомобили
+        href: /dashboard/autos/operator
+    monitoring:
+      - label: Участники
+        href: /dashboard/members/monitoring
+      - label: Автомобили
+        href: /dashboard/autos/operator
+    "": []
+  links:
+    docs: /toread
+
+report_settings:
+  dashboard:
+    pass_window_minutes: 120
+    top_items_limit: 15
+    anomaly_threshold: 5
+    overload_percent_red: 100
+    overload_percent_yellow: 85
