@@ -380,6 +380,7 @@ func importMembers(c echo.Context) error {
 			Middlename:      row.GetCell(3).Value,
 			Birth:           birthDate,
 			Responsible:     parseBool(row.GetCell(5).Value),
+			CompanyName:     company.Name,
 			CompanyID:       companyID,
 			AccreditationID: accreditationID,
 		}
@@ -425,6 +426,12 @@ func importMembers(c echo.Context) error {
 					return fmt.Errorf("Участник %s %s %s с документом %s уже существует в базе", member.Surname, member.Name, member.Middlename, member.Document)
 				}
 				return fmt.Errorf("Не удалось создать участника %s %s %s: %w", member.Surname, member.Name, member.Middlename, err)
+			}
+			if member.Barcode == "" {
+				member.Barcode = utils.MD5Hash(fmt.Sprintf("%sFFF300001001001", member.ID.String()))
+				if err := tx.Model(&model.Member{}).Where("id = ?", member.ID).Update("barcode", member.Barcode).Error; err != nil {
+					return fmt.Errorf("Не удалось сгенерировать штрихкод для участника %s %s %s: %w", member.Surname, member.Name, member.Middlename, err)
+				}
 			}
 			tx.Preload("Accreditation.Gates").Preload("Events").Preload("Gates").First(&member, member.ID)
 			memberDetails, _ := json.Marshal(member)

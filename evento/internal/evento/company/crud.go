@@ -369,7 +369,18 @@ func updateCompany(c echo.Context) error {
 	// 	db.Delete(&limit)
 	// }
 
-	db.Save(&company)
+	if err := db.Save(&company).Error; err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	if err := db.Model(&model.Member{}).Where("company_id = ?", company.ID).Update("company_name", company.Name).Error; err != nil {
+		return c.String(http.StatusInternalServerError, fmt.Sprintf("ошибка синхронизации названия компании у участников: %s", err.Error()))
+	}
+	if err := db.Model(&model.Auto{}).Where("company_id = ?", company.ID).Updates(map[string]interface{}{
+		"company": company.Name,
+		"route":   company.DefaultRoute,
+	}).Error; err != nil {
+		return c.String(http.StatusInternalServerError, fmt.Sprintf("ошибка синхронизации названия компании/маршрута у авто: %s", err.Error()))
+	}
 
 	db.Preload("User").Preload("AccreditationLimits").Preload("EventLimits").Preload("GateLimits").Preload("Members.Accreditation").Preload("Autos").First(&company, company.ID)
 	companyDetails, _ := json.Marshal(company)

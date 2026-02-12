@@ -94,6 +94,10 @@ func createAuto(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	auto.CompanyID = company.ID
+	auto.Company = company.Name
+	if auto.Route == "" {
+		auto.Route = company.DefaultRoute
+	}
 	if err := db.Create(&auto).Error; err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
@@ -128,7 +132,13 @@ func updateAuto(c echo.Context) error {
 	if err := c.Bind(&auto); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
-	db.Save(&auto)
+	auto.Company = company.Name
+	if auto.Route == "" {
+		auto.Route = company.DefaultRoute
+	}
+	if err := db.Save(&auto).Error; err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
 	autoDetails, _ := json.Marshal(auto)
 	logAutoHistory(db, c, auto.ID, "update", string(autoDetails))
 	return c.JSON(http.StatusOK, auto)

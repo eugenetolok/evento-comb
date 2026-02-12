@@ -12,7 +12,6 @@ import (
 	"github.com/eugenetolok/evento/pkg/smtp"
 	"github.com/eugenetolok/evento/pkg/utils"
 	"github.com/manifoldco/promptui"
-	"github.com/robfig/cron"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/yaml.v3"
 	"gorm.io/driver/sqlite"
@@ -85,10 +84,8 @@ func InitEvento(f model.Flags) {
 		}
 		os.Exit(0)
 	}
-	c := cron.New()
-	c.AddFunc("@every 60s", updateMembersAndAutosCompanyName)
-	c.AddFunc("@every 60s", updateMembersBarcode)
-	c.Start()
+	syncDerivedCompanyFieldsOnce()
+	syncEmptyMemberBarcodesOnce()
 }
 
 func updateConfig() {

@@ -188,6 +188,10 @@ func importTemplate(c echo.Context) error {
 			Description: row.GetCell(2).Value,
 			Route:       row.GetCell(3).Value,
 			CompanyID:   companyID,
+			Company:     company.Name,
+		}
+		if auto.Route == "" {
+			auto.Route = company.DefaultRoute
 		}
 
 		// Save the auto to the database
