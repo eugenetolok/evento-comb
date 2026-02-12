@@ -1,0 +1,97 @@
+// components/popups/addGateToCompanyModal.jsx
+import React, { useState, useEffect } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Select, SelectItem, useDisclosure } from "@heroui/react";
+import { axiosInstanceAuth } from "@/axiosConfig";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const AddGateToCompanyModal = ({ companyId }: any) => {
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const [gatesList, setGatesList] = useState<any>([]);
+    const [selectedGate, setSelectedGate] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState<any>(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            axiosInstanceAuth.get('/api/gates')
+                .then(response => {
+                    setGatesList(response.data);
+                })
+                .catch(error => {
+                    toast.error("Не удалось загрузить список зон доступа.");
+                    console.error("Error fetching gates:", error);
+                });
+        }
+    }, [isOpen]);
+
+    const handleConfirm = async () => {
+        if (!selectedGate) {
+            toast.warn("Пожалуйста, выберите зону доступа.");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await axiosInstanceAuth.post(`/api/companies/${companyId}/add-gate-to-members`, {
+                gate_id: selectedGate
+            });
+            toast.success(`Зона успешно добавлена. Затронуто записей: ${response.data.rows_affected}`);
+            onClose();
+        } catch (error: any) {
+            toast.error("Ошибка при добавлении зоны: " + (error.response?.data?.error || error.message));
+            console.error("Error adding gate to company members:", error);
+        } finally {
+            setIsLoading(false);
+            setSelectedGate(null);
+        }
+    };
+
+    return (
+        <>
+            <Button auto className="mr-1" color="secondary" variant="flat" onPress={onOpen}>
+                Добавить зону всем
+            </Button>
+            <Modal
+                backdrop="blur"
+                size="md"
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                onClose={() => setSelectedGate(null)}
+            >
+                <ModalContent>
+                    {(modalClose) => (
+                        <>
+                            <ModalHeader>Добавить зону всем участникам компании</ModalHeader>
+                            <ModalBody>
+                                <p>Выберите зону доступа, которая будет добавлена всем участникам этой компании. Это действие нельзя будет отменить массово.</p>
+                                <Select
+                                    isRequired
+                                    label="Зона доступа"
+                                    placeholder="Выберите зону из списка"
+                                    selectedKeys={selectedGate ? [selectedGate] : []}
+                                    onSelectionChange={(keys) => setSelectedGate(Array.from(keys)[0])}
+                                >
+                                    {gatesList.map((gate: any) => (
+                                        <SelectItem key={gate.id}>
+                                            {gate.name}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={modalClose}>
+                                    Отмена
+                                </Button>
+                                <Button color="primary" onPress={handleConfirm} isLoading={isLoading}>
+                                    Подтвердить
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+        </>
+    );
+};
+
+export default AddGateToCompanyModal;

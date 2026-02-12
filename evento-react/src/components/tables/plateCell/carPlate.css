@@ -1,0 +1,61 @@
+.carPlateContainer {
+    width: 100%;
+    position: relative;
+}
+
+.carPlate {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    /* grid-template-rows: repeat(0.5, auto); */
+    grid-template-rows: 10px auto;
+    /* Adjust the height here */
+    grid-gap: 1px;
+    font-family: 'Arial', sans-serif;
+    background-color: #fff;
+    color: #000;
+    padding: 3px;
+    border: 2px solid #000;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.plateNumber {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: center;
+    font-size: var(--plate-font-size);
+    border-right: 1px solid #000;
+    /* Set a one-pixel right border */
+    padding-right: 2px;
+    padding-left: 2px;
+    /* Adjust the distance between text and border */
+}
+
+.plateRegion {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: calc(var(--plate-font-size) * 0.8);
+    justify-self: center;
+    align-self: center;
+    /* padding: 0 2px; */
+}
+
+.russianFlagContainer {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.russianFlag {
+    margin-left: 2px;
+    width: 18px;
+    height: 10px;
+    border: 0.1px solid rgb(0, 0, 0);
+    background: linear-gradient(to bottom, #fff 33.33%, #0071bd 33.33%, #0071bd 66.66%, #d52b1e 66.66%);
+}
+
+.rusLabel {
+    font-size: 10px;
+}

@@ -1,0 +1,34 @@
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.bg-gradient-animated {
+    background-image: linear-gradient(to right, #f27121 0%, #e94057 25%, #a61e4d 50%, #e94057 75%, #f27121 100%);
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+}
+
+.close-button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 30px;
+    /* Increase the font size */
+    cursor: pointer;
+    margin-top: -10px;
+    margin-right: 5px;
+}
+
+.close-button:hover {
+    color: #c3c3c3;
+}

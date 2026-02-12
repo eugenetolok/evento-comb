@@ -1,0 +1,26 @@
+.video-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    filter: brightness(50%);
+}
+
+.non-video {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    background-color: black;
+}
+
+.top {
+    z-index: 999;
+}
