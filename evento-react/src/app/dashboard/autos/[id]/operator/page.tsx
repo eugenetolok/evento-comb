@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "@/shared/router";
 import { Navbar, NavbarContent, NavbarItem, NavbarBrand, Button } from "@heroui/react";
+import CarPlate from "@/components/tables/plateCell/carPlate";
 
 
 const Car = ({ params }: any) => {
@@ -72,26 +73,32 @@ const Car = ({ params }: any) => {
                 </NavbarContent>
                 <NavbarContent justify="end">
                     <NavbarItem>
-                        <Button
-                            color="primary"
-                            variant="flat"
-                            onClick={handleGivePass}
-                            disabled={car.pass}
-                        >
-                            {car.pass ? 'Пропуск выдан' : 'Выдать пропуск'} (монтаж)
-                        </Button>
-                        <Button
-                            color="warning"
-                            variant="flat"
-                            onClick={handleGivePass2}
-                            disabled={car.pass2}
-                        >
-                            {car.pass2 ? 'Пропуск выдан' : 'Выдать пропуск'} (демонтаж)
-                        </Button>
+                        <div className="flex flex-wrap gap-2 justify-end">
+                            <Button
+                                color="primary"
+                                variant="flat"
+                                onClick={handleGivePass}
+                                disabled={car.pass}
+                            >
+                                {car.pass ? 'Пропуск выдан' : 'Выдать пропуск'} (монтаж)
+                            </Button>
+                            <Button
+                                color="warning"
+                                variant="flat"
+                                onClick={handleGivePass2}
+                                disabled={car.pass2}
+                            >
+                                {car.pass2 ? 'Пропуск выдан' : 'Выдать пропуск'} (демонтаж)
+                            </Button>
+                        </div>
                     </NavbarItem>
                 </NavbarContent>
             </Navbar>
             <div className="flex w-full flex-wrap flex-1 flex-col gap-3 px-6 py-2">
+                <div className="rounded-2xl border border-divider bg-content1 p-3 md:p-4 max-w-sm">
+                    <p className="text-xs uppercase tracking-wide text-default-500 mb-2">Визуализация номера</p>
+                    <CarPlate plateCode={car.number} />
+                </div>
                 <Input
                     clearable
                     bordered

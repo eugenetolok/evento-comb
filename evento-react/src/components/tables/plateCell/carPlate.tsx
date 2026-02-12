@@ -1,40 +1,67 @@
-import React from 'react';
-import '@/components/tables/plateCell/carPlate.css';
+import React from "react";
+import "@/components/tables/plateCell/carPlate.css";
 
-const CarPlate = ({ plateCode }: { plateCode: string }) => {
-    const [plateSize, setPlateSize] = React.useState<number>(120);
+const RUS_TO_LATIN_MAP: Record<string, string> = {
+    А: "A",
+    В: "B",
+    Е: "E",
+    К: "K",
+    М: "M",
+    Н: "H",
+    О: "O",
+    Р: "P",
+    С: "C",
+    Т: "T",
+    У: "Y",
+    Х: "X",
+};
 
-    React.useEffect(() => {
-        const resizeObserver = new ResizeObserver((entries) => {
-            const parentWidth = entries[0].contentRect.width;
-            setPlateSize(Math.min(Math.max(parentWidth / 2, 100), 200));
-        });
+const RUS_PLATE_REGEX = /^([ABEKMHOPCTYX])(\d{3})([ABEKMHOPCTYX]{2})(\d{2,3})$/;
 
-        const parentElement = document.querySelector('.carPlateContainer');
-        if (parentElement) {
-            resizeObserver.observe(parentElement);
-        }
+const normalizePlate = (value: string): string => {
+    return value
+        .toUpperCase()
+        .replace(/[\s-]/g, "")
+        .split("")
+        .map((symbol) => RUS_TO_LATIN_MAP[symbol] ?? symbol)
+        .join("");
+};
 
-        // Clean up the ResizeObserver on component unmount
-        return () => {
-            resizeObserver.disconnect();
-        };
-    }, []);
+type CarPlateProps = {
+    plateCode?: string | null;
+    compact?: boolean;
+    className?: string;
+};
 
-    console.log("plateCode", plateCode);
-    const regionCode = plateCode.slice(6);
-    console.log("regionCode", regionCode);
-    const plateNumber = plateCode.slice(0, 6);
-    console.log("plateNumber", plateNumber);
+const CarPlate = ({ plateCode, compact = false, className = "" }: CarPlateProps) => {
+    const rawPlate = (plateCode ?? "").trim();
+    const normalizedPlate = normalizePlate(rawPlate);
+    const plateMatch = normalizedPlate.match(RUS_PLATE_REGEX);
+    const containerClassName = `carPlateContainer ${compact ? "isCompact" : ""} ${!plateMatch ? "isInvalid" : ""} ${className}`.trim();
+
+    if (!plateMatch) {
+        return (
+            <div className={containerClassName}>
+                <div className="carPlate carPlateInvalid">
+                    <span className="plateInvalidValue">{rawPlate || "Без номера"}</span>
+                </div>
+            </div>
+        );
+    }
+
+    const [, firstLetter, digits, suffixLetters, regionCode] = plateMatch;
+    const plateNumber = `${firstLetter}${digits}${suffixLetters}`;
 
     return (
-        <div className="carPlateContainer">
-            <div className="carPlate" style={{ width: `${plateSize}px`, fontSize: `${plateSize / 7.5}px` }}>
+        <div className={containerClassName}>
+            <div className="carPlate">
                 <span className="plateNumber">{plateNumber}</span>
-                <span className="plateRegion">{regionCode}</span>
-                <div className="russianFlagContainer">
-                    <span className="rusLabel">RUS</span>
-                    <div className="russianFlag"></div>
+                <div className="plateRegionBlock">
+                    <span className="plateRegion">{regionCode}</span>
+                    <div className="russianFlagContainer">
+                        <span className="rusLabel">RUS</span>
+                        <span className="russianFlag" />
+                    </div>
                 </div>
             </div>
         </div>

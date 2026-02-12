@@ -4,6 +4,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Button
 import { CarIcon, TruckIcon } from "@/components/icons";
 import Table from "@/components/tables/universal/table";
 import { useRouter } from '@/shared/router';
+import CarPlate from "@/components/tables/plateCell/carPlate";
 
 const columns = [
     { name: "ID", uid: "id", sortable: true },
@@ -44,12 +45,8 @@ const CompanyAutos = ({ company }: any) => {
         const cellValue = auto[columnKey];
 
         switch (columnKey) {
-            case "name":
-                return (
-                    <div className="flex flex-col">
-                        {cellValue}
-                    </div>
-                );
+            case "number":
+                return <CarPlate plateCode={String(cellValue ?? "")} compact />;
             case "type":
                 if (auto.type === "truck") {
                     return <Button color="primary"><TruckIcon /></Button>
@@ -57,7 +54,7 @@ const CompanyAutos = ({ company }: any) => {
                     return <Button color="primary"><CarIcon /></Button>
                 }
             default:
-                return cellValue;
+                return cellValue ?? "—";
         }
     }, []);
 

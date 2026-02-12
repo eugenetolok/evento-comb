@@ -1,61 +1,137 @@
 .carPlateContainer {
-    width: 100%;
-    position: relative;
+    width: fit-content;
+    max-width: min(100%, 420px);
 }
 
 .carPlate {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    /* grid-template-rows: repeat(0.5, auto); */
-    grid-template-rows: 10px auto;
-    /* Adjust the height here */
-    grid-gap: 1px;
-    font-family: 'Arial', sans-serif;
+    min-height: 48px;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: fit-content;
+    max-width: 100%;
+    gap: 6px;
+    font-family: "Arial", sans-serif;
     background-color: #fff;
-    color: #000;
-    padding: 3px;
-    border: 2px solid #000;
-    border-radius: 5px;
+    color: #0f172a;
+    padding: 5px 7px;
+    border: 2px solid #111827;
+    border-radius: 8px;
     box-sizing: border-box;
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
 }
 
 .plateNumber {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    align-self: center;
-    font-size: var(--plate-font-size);
-    border-right: 1px solid #000;
-    /* Set a one-pixel right border */
-    padding-right: 2px;
-    padding-left: 2px;
-    /* Adjust the distance between text and border */
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    border-right: 1px solid #111827;
+    padding-right: 6px;
+    white-space: nowrap;
+}
+
+.plateRegionBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    gap: 2px;
 }
 
 .plateRegion {
-    grid-column: 2;
-    grid-row: 1;
-    font-size: calc(var(--plate-font-size) * 0.8);
-    justify-self: center;
-    align-self: center;
-    /* padding: 0 2px; */
+    font-size: 17px;
+    line-height: 1;
+    font-weight: 800;
 }
 
 .russianFlagContainer {
-    grid-column: 2;
-    grid-row: 2;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
+    gap: 3px;
 }
 
 .russianFlag {
-    margin-left: 2px;
-    width: 18px;
+    width: 15px;
     height: 10px;
-    border: 0.1px solid rgb(0, 0, 0);
+    border: 1px solid #111827;
     background: linear-gradient(to bottom, #fff 33.33%, #0071bd 33.33%, #0071bd 66.66%, #d52b1e 66.66%);
 }
 
 .rusLabel {
-    font-size: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.carPlateInvalid {
+    border-style: dashed;
+    border-color: #64748b;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    display: block;
+    width: 100%;
+}
+
+.plateInvalidValue {
+    display: block;
+    color: #0f172a;
+    font-size: 16px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    word-break: normal;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    max-width: 100%;
+}
+
+.carPlateContainer.isCompact {
+    max-width: min(100%, 182px);
+}
+
+.carPlateContainer.isCompact .carPlate {
+    min-height: 40px;
+    gap: 6px;
+    padding: 4px 6px;
+}
+
+.carPlateContainer.isCompact .plateNumber {
+    font-size: 17px;
+    padding-right: 5px;
+}
+
+.carPlateContainer.isCompact .plateRegionBlock {
+    min-width: 28px;
+    gap: 2px;
+}
+
+.carPlateContainer.isCompact .plateRegion {
+    font-size: 13px;
+}
+
+.carPlateContainer.isCompact .rusLabel {
+    font-size: 7px;
+}
+
+.carPlateContainer.isCompact .russianFlag {
+    width: 12px;
+    height: 8px;
+}
+
+.carPlateContainer.isCompact .plateInvalidValue {
+    font-size: 13px;
+    line-height: 1.15;
+}
+
+.carPlateContainer.isCompact.isInvalid {
+    max-width: min(100%, 240px);
+}
+
+.carPlateContainer.isInvalid:not(.isCompact) {
+    max-width: min(100%, 460px);
 }

@@ -1,17 +1,11 @@
 'use client';
 import React, { useEffect } from "react";
-import { Chip, Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
+import { Button } from "@heroui/react";
 import Table from "@/components/tables/universal/table";
 import { axiosInstanceAuth } from "@/axiosConfig";
 import { useRouter } from '@/shared/router';
-import { CarIcon, TruckIcon, VerticalDotsIcon } from "@/components/icons";
+import { CarIcon, TruckIcon } from "@/components/icons";
 import CarPlate from "@/components/tables/plateCell/carPlate";
-
-const statusColorMap = {
-	"Подтверждён": "success",
-	"Не отправлен": "danger",
-	"В ожидании": "warning",
-};
 
 const columns = [
 	{ name: "ID", uid: "id", sortable: true },
@@ -48,20 +42,16 @@ export default function App() {
 		const cellValue = auto[columnKey];
 
 		switch (columnKey) {
-			case "name":
-				return (
-					<div className="flex flex-col">
-						{cellValue}
-					</div>
-				);
+			case "number":
+				return <CarPlate plateCode={String(cellValue ?? "")} compact />;
 			case "type":
-				if (auto.type === "truck") { // <--- CORRECTED COMPARISON
+				if (auto.type === "truck") {
 					return <Button color="primary"><TruckIcon /></Button>
 				} else {
 					return <Button color="primary"><CarIcon /></Button>
 				}
 			default:
-				return cellValue;
+				return cellValue ?? "—";
 		}
 	}, []);
 
@@ -72,9 +62,11 @@ export default function App() {
 	}, []);
 
 	return (
-		<div>
-			<h1 className="text-3xl mb-5">Автомобили редактора компаний</h1>
-			<Table searchColumns={["number", "description"]} tableItems={companies} columns={columns} INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS} renderCell={renderCell} CustomAddComponent={addCar} onRowClick={(item) => { router.push(`/dashboard/autos/${item.id}`) }} />
+		<div className="space-y-4">
+			<h1 className="text-3xl">Автомобили редактора компаний</h1>
+			<div className="rounded-2xl border border-divider bg-content1 p-3 md:p-4 shadow-sm">
+				<Table searchColumns={["number", "description"]} tableItems={companies} columns={columns} INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS} renderCell={renderCell} CustomAddComponent={addCar} onRowClick={(item) => { router.push(`/dashboard/autos/${item.id}`) }} />
+			</div>
 		</div>
 	);
 }

@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { handleDelete } from "@/components/utils/delete";
 import { useRouter } from "@/shared/router";
+import CarPlate from "@/components/tables/plateCell/carPlate";
 
 const carTypes = [
     { key: 'truck', name: 'Грузовой' },
@@ -92,6 +93,10 @@ const AddCar = ({ params }: any) => {
                 </div>
             )}
             <div className="flex w-full flex-wrap flex-1 flex-col gap-3 px-6 py-2">
+                <div className="rounded-2xl border border-divider bg-content1 p-3 md:p-4 max-w-sm">
+                    <p className="text-xs uppercase tracking-wide text-default-500 mb-2">Визуализация номера</p>
+                    <CarPlate plateCode={car.number} />
+                </div>
                 <Input
                     clearable
                     bordered
