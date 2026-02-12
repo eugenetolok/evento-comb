@@ -98,14 +98,14 @@ export default function PricingPage() {
 					</Card>
 					<Card className="col-span-12 sm:col-span-4 h-[200px] bg-gradient-to-tr from-purple-600 to-green-600">
 						<CardHeader className="absolute z-10 top-1 flex-col items-start">
-							<h4 className="text-white font-medium text-2xl">Kick участников</h4>
+							<h4 className="text-white font-medium text-2xl">SMART-менеджмент участников</h4>
 						</CardHeader>
 
 						<CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
 							<div>
 							</div>
 							<Link href="/dashboard/admin/kick" className={buttonStyles({ color: "primary", variant: "shadow" })}>
-								Перейти к удалению зон
+								Открыть матрицу доступа
 							</Link>
 						</CardFooter>
 					</Card>

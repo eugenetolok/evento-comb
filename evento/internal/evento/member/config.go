@@ -26,6 +26,8 @@ func InitMembers(g *echo.Group, dbInstance *gorm.DB, jwtConfig echojwt.Config, p
 	g.GET("/offline", offlineScanner, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.GET("/:id/memberPasses", memberPasses, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.GET("/search", searchMembers, utils.RoleMiddleware([]string{"admin", "operator"}))
+	g.GET("/smart-management", getSmartManagementData, utils.RoleMiddleware([]string{"admin"}))
+	g.POST("/smart-management", updateSmartManagement, utils.RoleMiddleware([]string{"admin"}))
 	g.GET("", getMembers, utils.RoleMiddleware([]string{"admin", "operator", "monitoring"}))
 	g.POST("", createMember, utils.RoleMiddleware([]string{"admin", "editor", "company"}))
 	g.GET("/:id", getMember, utils.UUIDMiddleware)
