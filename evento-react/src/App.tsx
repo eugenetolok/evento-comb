@@ -30,6 +30,7 @@ import AutoOperatorPage from "@/app/dashboard/autos/[id]/operator/page";
 
 import AdminMainPage from "@/app/dashboard/admin/main/page";
 import AdminKickPage from "@/app/dashboard/admin/kick/page";
+import AdminCompanyFreezePage from "@/app/dashboard/admin/company-freeze/page";
 import AdminReportsPage from "@/app/dashboard/admin/reports/page";
 import AdminUsersPage from "@/app/dashboard/admin/users/page";
 import AdminUserPage from "@/app/dashboard/admin/users/[id]/page";
@@ -249,6 +250,14 @@ function App() {
       <Route
         element={
           <DashboardRoute>
+            <AdminCompanyFreezePage />
+          </DashboardRoute>
+        }
+        path="/dashboard/admin/company-freeze"
+      />
+      <Route
+        element={
+          <DashboardRoute>
             <AdminReportsPage />
           </DashboardRoute>
         }
@@ -342,4 +351,3 @@ function App() {
 }
 
 export default App;
-

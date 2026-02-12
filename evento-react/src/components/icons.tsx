@@ -25,7 +25,7 @@ export const LogoFestLoginPage = ({ size = 124, width = size, height = size, fil
 };
 
 
-export const LogoFest = ({ size = 124, width = size, height = size, ...props }) => {
+export const LogoFest = ({ size = 124, width = size, height = size, fill: fillOverride, ...props }) => {
 	const { theme, setTheme } = useTheme();
 	const [fill, setFill] = useState<any>('#fff');
 
@@ -34,8 +34,8 @@ export const LogoFest = ({ size = 124, width = size, height = size, ...props }) 
 		if (storedTheme) {
 			setTheme(storedTheme);
 		}
-		setFill(theme === 'dark' ? '#fff' : '#000');
-	}, [setTheme, theme]);
+		setFill(fillOverride ?? (theme === 'dark' ? '#fff' : '#000'));
+	}, [setTheme, theme, fillOverride]);
 
 
 	return (

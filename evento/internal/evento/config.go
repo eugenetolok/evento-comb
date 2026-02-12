@@ -84,6 +84,7 @@ func InitEvento(f model.Flags) {
 		}
 		os.Exit(0)
 	}
+	ensureUserFreezeScheduleColumns()
 	syncDerivedCompanyFieldsOnce()
 	syncEmptyMemberBarcodesOnce()
 }

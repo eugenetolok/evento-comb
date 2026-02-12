@@ -31,7 +31,8 @@ export const Navbar = () => {
 	const role = useContext(AppContext);
 	const normalizedRole = role ?? "";
 	const location = useLocation();
-	const [isMenuOpen, setIsMenuOpen] = useState<any>(false);
+	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+	const isDashboardHome = location.pathname === "/dashboard" || location.pathname === "/dashboard/";
 
 	useEffect(() => {
 		setIsMenuOpen(false);
@@ -58,15 +59,27 @@ export const Navbar = () => {
 	}
 
 	return (
-		<NextUINavbar maxWidth="xl" position="sticky" isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
+		<NextUINavbar
+			maxWidth="xl"
+			position="sticky"
+			isMenuOpen={isMenuOpen}
+			onMenuOpenChange={setIsMenuOpen}
+			className={isDashboardHome ? "bg-transparent shadow-none" : undefined}
+			classNames={isDashboardHome ? {
+				base: "bg-transparent before:bg-transparent shadow-none",
+				wrapper: "bg-transparent",
+				menu: "bg-black/35 backdrop-blur-xl",
+				toggleIcon: "text-white",
+			} : undefined}
+		>
 			<NavbarContent className="basis-1/5 sm:basis-full" justify="start">
 				<NavbarBrand as="li" className="gap-3 max-w-fit">
 					<RouterLink className="flex justify-start items-center gap-1" to="/dashboard">
 						<div className="mt-[-10px]">
 							<div className="w-full flex items-center justify-center text-center">
-								<LogoFest size={48} />
+								<LogoFest size={48} fill={isDashboardHome ? "#fff" : undefined} />
 							</div>
-							<div className="w-full text-center mt-[-10px]">
+							<div className={clsx("w-full text-center mt-[-10px]", isDashboardHome ? "text-white" : undefined)}>
 								{getCity()}
 							</div>
 						</div>
@@ -78,7 +91,8 @@ export const Navbar = () => {
 							<RouterLink
 								className={clsx(
 									linkStyles({ color: "foreground" }),
-									"data-[active=true]:text-primary data-[active=true]:font-medium"
+									"data-[active=true]:text-primary data-[active=true]:font-medium",
+									isDashboardHome ? "text-white hover:text-white/90" : undefined
 								)}
 								to={item.href}
 							>
@@ -93,23 +107,32 @@ export const Navbar = () => {
 				className="hidden sm:flex basis-1/5 sm:basis-full"
 				justify="end"
 			>
-				<NavbarItem className="hidden sm:flex gap-2">
-					<ThemeSwitch />
+				<NavbarItem className={clsx("hidden sm:flex gap-2", isDashboardHome ? "text-white" : undefined)}>
+					<ThemeSwitch classNames={isDashboardHome ? { wrapper: "!text-white" } : undefined} />
 				</NavbarItem>
-				{siteConfig.version}
-				<NavbarItem className="hidden lg:flex"><Button variant="flat" onClick={() => exitHandler()}>Выйти</Button></NavbarItem>
+				<span className={isDashboardHome ? "text-white" : undefined}>{siteConfig.version}</span>
+				<NavbarItem className="hidden lg:flex">
+					<Button
+						variant={isDashboardHome ? "bordered" : "flat"}
+						className={isDashboardHome ? "text-white border-white/45 bg-white/10" : undefined}
+						onClick={() => exitHandler()}
+					>
+						Выйти
+					</Button>
+				</NavbarItem>
 
 
 				<NavbarMenuToggle
-					className="lg:hidden"
+					className={clsx("lg:hidden", isDashboardHome ? "text-white" : undefined)}
 					aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
 				/>
 			</NavbarContent>
 
-			<NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-				<ThemeSwitch />
-				{siteConfig.version}
+			<NavbarContent className={clsx("sm:hidden basis-1 pl-4", isDashboardHome ? "text-white" : undefined)} justify="end">
+				<ThemeSwitch classNames={isDashboardHome ? { wrapper: "!text-white" } : undefined} />
+				<span className={isDashboardHome ? "text-white" : undefined}>{siteConfig.version}</span>
 				<NavbarMenuToggle
+					className={isDashboardHome ? "text-white" : undefined}
 					aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
 				/>
 			</NavbarContent>
@@ -122,6 +145,7 @@ export const Navbar = () => {
 								color="foreground"
 								href={item.href}
 								size="lg"
+								className={isDashboardHome ? "text-white" : undefined}
 								onPress={() => setIsMenuOpen(false)}
 							>
 								{item.label}
@@ -129,7 +153,13 @@ export const Navbar = () => {
 						</NavbarMenuItem>
 					))}
 					<NavbarMenuItem>
-						<Button variant="flat" onClick={() => exitHandler()}>Выйти</Button>
+						<Button
+							variant={isDashboardHome ? "bordered" : "flat"}
+							className={isDashboardHome ? "text-white border-white/45 bg-white/10" : undefined}
+							onClick={() => exitHandler()}
+						>
+							Выйти
+						</Button>
 					</NavbarMenuItem>
 				</div>
 			</NavbarMenu>

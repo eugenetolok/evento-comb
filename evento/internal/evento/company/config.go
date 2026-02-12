@@ -12,11 +12,15 @@ var db *gorm.DB
 // InitCompanies entry point of companys
 func InitCompanies(g *echo.Group, dbInstance *gorm.DB, jwtConfig echojwt.Config) {
 	db = dbInstance
+	startCompanyFreezeScheduler(db)
 	g.Use(echojwt.WithConfig(jwtConfig))
 	// TODO: write restrict logic inside functions for all kind of roles (not middleware)
 	g.GET("/search", searchCompanies, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.GET("/editor", editorCompanies, utils.RoleMiddleware([]string{"admin", "editor"}))
 	g.GET("/my", getMyCompany, utils.RoleMiddleware([]string{"admin", "company"}))
+	g.GET("/freeze/status", getCompanyFreezeStatus, utils.RoleMiddleware([]string{"admin"}))
+	g.POST("/freeze/schedule", scheduleCompanyFreezeAll, utils.RoleMiddleware([]string{"admin"}))
+	g.POST("/freeze/all", setCompanyFreezeAllNow, utils.RoleMiddleware([]string{"admin"}))
 	g.POST("", createCompany, utils.RoleMiddleware([]string{"admin", "editor"}))
 	g.GET("/:id", getCompany, utils.UUIDMiddleware, utils.RoleMiddleware([]string{"admin", "editor"}))
 	g.PUT("/:id", updateCompany, utils.RoleMiddleware([]string{"admin", "editor"}), utils.UUIDMiddleware)

@@ -2,9 +2,9 @@
 import { Link } from "@heroui/link";
 import { button as buttonStyles } from "@heroui/theme";
 import { siteConfig } from "@/config/site";
-import { title, subtitle } from "@/components/primitives";
 import React, { useContext } from 'react';
 import { AppContext } from './context';
+import VkLiquidMainBackground from "@/components/backgrounds/vkLiquidMain";
 
 
 const roleMap: Record<string, string> = {
@@ -41,33 +41,36 @@ export default function Home() {
 	}
 
 	return (
-		<section className="flex flex-col justify-center items-center  gap-4 py-8 md:py-10 min-h-full">
-			<div className="inline-block max-w-lg text-center">
-				<h1 className={title()}>VK FEST&nbsp;</h1>
-				<h1 className={title({ color: "blue" })}>{siteConfig.year}&nbsp;</h1>
-				<h2 className={subtitle({ class: "mt-4" })}>
-					Ваша роль: {roleMap[normalizedRole]}
-				</h2>
-			</div>
+		<>
+			<VkLiquidMainBackground fullScreen />
+			<section className="relative z-10 flex min-h-[72vh] flex-col items-center justify-center gap-6 py-8 md:py-10">
+				<div className="inline-block max-w-2xl text-center text-white">
+					<h1 className="text-5xl lg:text-7xl font-semibold tracking-tight drop-shadow-[0_8px_34px_rgba(0,0,0,0.54)]">
+						VK FEST <span className="bg-gradient-to-b from-[#9ed1ff] to-[#4da1ff] bg-clip-text text-transparent">{siteConfig.year}</span>
+					</h1>
+					<h2 className="mt-4 text-2xl lg:text-4xl font-semibold text-white/90 drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)]">
+						Ваша роль: {roleMap[normalizedRole]}
+					</h2>
+				</div>
 
-			<div className="grid grid-cols-12 grid-rows-2 gap-3">
-				<Link
-					isExternal
-					href={getDocs()}
-					className={buttonStyles({ color: "primary", variant: "shadow" }) + " col-span-12 sm:col-span-6"}
-				>
-					Документы к прочтению
-				</Link>
-				{roleButtonData ? (
+				<div className="grid grid-cols-12 grid-rows-2 gap-3 rounded-2xl p-4">
 					<Link
-						className={buttonStyles({ variant: "bordered" }) + " col-span-12 sm:col-span-6"}
-						href={roleButtonData?.url}
+						isExternal
+						href={getDocs()}
+						className={buttonStyles({ color: "primary", variant: "shadow" }) + " col-span-12 sm:col-span-6"}
 					>
-						{roleButtonData?.title}
+						Документы к прочтению
 					</Link>
-				) : null}
-			</div>
-
-		</section>
+					{roleButtonData ? (
+						<Link
+							className={buttonStyles({ variant: "bordered" }) + " col-span-12 sm:col-span-6"}
+							href={roleButtonData?.url}
+						>
+							{roleButtonData?.title}
+						</Link>
+					) : null}
+				</div>
+			</section>
+		</>
 	);
 }

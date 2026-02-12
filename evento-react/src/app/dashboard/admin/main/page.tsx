@@ -9,7 +9,7 @@ export default function PricingPage() {
 	return (
 		<div>
 			<div>
-				<div className="gap-2 grid grid-cols-12 grid-rows-2 px-8">
+				<div className="gap-2 grid grid-cols-12 grid-rows-2 px-8 py-4">
 					<Card className="col-span-12 sm:col-span-4 h-[200px]  bg-gradient-to-tr from-blue-600 to-purple-600">
 						<CardHeader className="absolute z-10 top-1 flex-col items-start">
 							<h4 className="text-white font-medium text-2xl">Мероприятия</h4>
@@ -109,6 +109,18 @@ export default function PricingPage() {
 							</Link>
 						</CardFooter>
 					</Card>
+					<Card className="col-span-12 sm:col-span-4 h-[200px] bg-gradient-to-tr from-blue-600 to-purple-600">
+						<CardHeader className="absolute z-10 top-1 flex-col items-start">
+							<h4 className="text-white font-medium text-2xl">Заморозка компаний</h4>
+						</CardHeader>
+						<CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
+							<div>
+							</div>
+							<Link href="/dashboard/admin/company-freeze" className={buttonStyles({ color: "primary", variant: "shadow" })}>
+								Открыть управление
+							</Link>
+						</CardFooter>
+					</Card>
 					<Card className="col-span-12 sm:col-span-4 h-[200px]  bg-gradient-to-tr from-purple-600 to-blue-600">
 						<CardHeader className="absolute z-10 top-1 flex-col items-start">
 							<h4 className="text-white font-medium text-2xl">Шаблоны бейджей</h4>
@@ -123,6 +135,6 @@ export default function PricingPage() {
 					</Card>
 				</div>
 			</div>
-		</div >
+		</div>
 	);
 }

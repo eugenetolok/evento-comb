@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/eugenetolok/evento/pkg/model"
 	"github.com/golang-jwt/jwt/v4"
@@ -102,8 +103,20 @@ func CheckUserWritePermission(c echo.Context, db *gorm.DB) bool {
 		fmt.Println("!!!! URGENT: some strange error!!!", err.Error())
 		return false
 	}
-	if !user.Frozen {
-		return true
+	// Apply delayed freeze/unfreeze for company users just-in-time.
+	// This keeps access state correct even if the scheduler tick has not run yet.
+	if user.Role == "company" && user.FrozenAt != nil && !user.FrozenAt.After(time.Now()) {
+		switch user.FrozenAction {
+		case "freeze":
+			user.Frozen = true
+		case "unfreeze":
+			user.Frozen = false
+		}
+		_ = db.Model(&model.User{}).Where("id = ?", user.ID).Updates(map[string]interface{}{
+			"frozen":        user.Frozen,
+			"frozen_action": "",
+			"frozen_at":     nil,
+		}).Error
 	}
-	return false
+	return !user.Frozen
 }

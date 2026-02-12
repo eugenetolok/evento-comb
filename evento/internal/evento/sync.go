@@ -54,3 +54,16 @@ func syncEmptyMemberBarcodesOnce() {
 		}
 	}
 }
+
+func ensureUserFreezeScheduleColumns() {
+	if !db.Migrator().HasColumn(&model.User{}, "FrozenAt") {
+		if err := db.Migrator().AddColumn(&model.User{}, "FrozenAt"); err != nil {
+			log.Printf("unable to add users.frozen_at column: %v", err)
+		}
+	}
+	if !db.Migrator().HasColumn(&model.User{}, "FrozenAction") {
+		if err := db.Migrator().AddColumn(&model.User{}, "FrozenAction"); err != nil {
+			log.Printf("unable to add users.frozen_action column: %v", err)
+		}
+	}
+}
