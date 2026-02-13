@@ -18,10 +18,8 @@ func InitMembers(g *echo.Group, dbInstance *gorm.DB, jwtConfig echojwt.Config, p
 	g.Use(echojwt.WithConfig(jwtConfig))
 	// kick start
 	g.GET("/gates/:gateId", getMembersByGate, utils.RoleMiddleware([]string{"admin", "monitoring"}))
-	g.GET("/kick/:memberId/:gateId", removeGateFromMember, utils.RoleMiddleware([]string{"admin", "monitoring"}))
 	g.POST("/kick/:memberId/:gateId", removeGateFromMember, utils.RoleMiddleware([]string{"admin", "monitoring"}))
 	// kick end
-	g.GET("/:id/block", block, utils.UUIDMiddleware, utils.RoleMiddleware([]string{"admin", "monitoring"}))
 	g.POST("/:id/block", block, utils.UUIDMiddleware, utils.RoleMiddleware([]string{"admin", "monitoring"}))
 	g.GET("/images", images, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.POST("/check", check, utils.RoleMiddleware([]string{"admin", "operator"}))
@@ -43,12 +41,9 @@ func InitMembers(g *echo.Group, dbInstance *gorm.DB, jwtConfig echojwt.Config, p
 	g.GET("/company", getCompanyMembers, utils.RoleMiddleware([]string{"admin", "editor", "company"}))
 	g.GET("/editor", getEditorMembers, utils.RoleMiddleware([]string{"admin", "editor"}))
 	// state:
-	g.GET("/setstate/:id", setState, utils.RoleMiddleware([]string{"admin"}))
 	g.POST("/setstate/:id", setState, utils.RoleMiddleware([]string{"admin"}))
-	g.GET("/print/:id", print, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.POST("/print/:id", print, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.POST("/massPrint", massPrint, utils.RoleMiddleware([]string{"admin", "operator"}))
-	g.GET("/giveBangle/:id", giveBangle, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.POST("/giveBangle/:id", giveBangle, utils.RoleMiddleware([]string{"admin", "operator"}))
 	// badge:
 	g.GET("/:id/badge-payload", getBadgePayload, utils.UUIDMiddleware, utils.RoleMiddleware([]string{"admin", "operator"}))

@@ -29,7 +29,6 @@ func InitCompanies(g *echo.Group, dbInstance *gorm.DB, jwtConfig echojwt.Config)
 	g.GET("/template", generateTemplate, utils.RoleMiddleware([]string{"admin", "editor", "company"}))
 	g.POST("/import", importTemplate, utils.RoleMiddleware([]string{"admin", "editor", "company"}))
 	g.GET("/limits", getCompanyLimits, utils.RoleMiddleware([]string{"admin", "editor", "company"}))
-	g.GET("/:id/freeze", freezeCompany, utils.RoleMiddleware([]string{"admin", "editor"}))
 	g.POST("/:id/freeze", freezeCompany, utils.RoleMiddleware([]string{"admin", "editor"}))
 	g.GET("/:id/printlimit", printLimit, utils.RoleMiddleware([]string{"admin", "operator"}))
 	// gates

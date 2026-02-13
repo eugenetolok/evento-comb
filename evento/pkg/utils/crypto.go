@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"crypto/md5"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
@@ -21,10 +20,17 @@ func GenerateRandomString(length int) string {
 	return string(bytes)
 }
 
-// MD5Hash generates an MD5 hash of a string.
-func MD5Hash(text string) string {
-	hash := md5.Sum([]byte(text))
-	return hex.EncodeToString(hash[:])
+// GenerateRandomHex returns cryptographically secure random hex with the requested byte length.
+func GenerateRandomHex(byteLength int) string {
+	if byteLength <= 0 {
+		return ""
+	}
+	bytes := make([]byte, byteLength)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		return ""
+	}
+	return hex.EncodeToString(bytes)
 }
 
 // SHA256Hash generates a SHA-256 hash of a string.

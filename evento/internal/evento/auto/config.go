@@ -22,8 +22,6 @@ func InitAutos(g *echo.Group, dbInstance *gorm.DB, jwtConfig echojwt.Config) {
 	g.DELETE("/:id", deleteAuto, utils.UUIDMiddleware, utils.RoleMiddleware([]string{"admin", "editor", "company"}))
 	g.GET("/template", generateTemplate, utils.RoleMiddleware([]string{"admin", "editor", "company"}))
 	g.POST("/import", importTemplate, utils.RoleMiddleware([]string{"admin", "editor", "company"}))
-	g.GET("/givePass/:id", givePass, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.POST("/givePass/:id", givePass, utils.RoleMiddleware([]string{"admin", "operator"}))
-	g.GET("/givePass2/:id", givePass2, utils.RoleMiddleware([]string{"admin", "operator"}))
 	g.POST("/givePass2/:id", givePass2, utils.RoleMiddleware([]string{"admin", "operator"}))
 }

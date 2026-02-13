@@ -176,16 +176,3 @@ func CheckUserWritePermission(c echo.Context, db *gorm.DB) bool {
 	}
 	return !user.Frozen
 }
-
-// MarkDeprecatedGet adds deprecation headers for legacy mutating GET endpoints.
-func MarkDeprecatedGet(c echo.Context, replacementMethod string) {
-	if c.Request().Method != http.MethodGet {
-		return
-	}
-	c.Response().Header().Set("Deprecation", "true")
-	c.Response().Header().Set("Sunset", time.Now().AddDate(0, 1, 0).UTC().Format(time.RFC1123))
-	if replacementMethod != "" {
-		c.Response().Header().Set("X-API-Replacement", replacementMethod)
-	}
-	c.Response().Header().Add("Warning", `299 - "Deprecated API: mutating GET endpoint, switch to POST"`)
-}

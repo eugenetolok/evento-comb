@@ -2,13 +2,10 @@ package member
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/eugenetolok/evento/pkg/model"
-	"github.com/eugenetolok/evento/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -28,8 +25,11 @@ func regenerateBarcode(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
 
-	// Generate new barcode by adding a timestamp to make it unique
-	newBarcode := utils.MD5Hash(fmt.Sprintf("%sFFF300001001001", member.ID.String()) + time.Now().String())
+	newBarcode, err := generateUniqueMemberBarcode(db)
+	if err != nil {
+		log.Printf("Failed to generate new barcode: %v", err)
+		return c.String(http.StatusInternalServerError, "Failed to generate barcode")
+	}
 	member.Barcode = newBarcode
 
 	if err := db.Save(&member).Error; err != nil {

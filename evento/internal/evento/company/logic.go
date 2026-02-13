@@ -62,7 +62,6 @@ func getMyCompany(c echo.Context) error {
 }
 
 func freezeCompany(c echo.Context) error {
-	utils.MarkDeprecatedGet(c, "POST")
 	if !utils.CheckUserWritePermission(c, db) {
 		return c.String(http.StatusBadRequest, "Ваш аккаунт работает в режиме только для чтения")
 	}

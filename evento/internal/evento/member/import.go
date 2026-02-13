@@ -413,7 +413,11 @@ func importMembers(c echo.Context) error {
 				return fmt.Errorf("Не удалось создать участника %s %s %s: %w", member.Surname, member.Name, member.Middlename, err)
 			}
 			if member.Barcode == "" {
-				member.Barcode = utils.MD5Hash(fmt.Sprintf("%sFFF300001001001", member.ID.String()))
+				barcode, barcodeErr := generateUniqueMemberBarcode(tx)
+				if barcodeErr != nil {
+					return fmt.Errorf("Не удалось сгенерировать штрихкод для участника %s %s %s: %w", member.Surname, member.Name, member.Middlename, barcodeErr)
+				}
+				member.Barcode = barcode
 				if err := tx.Model(&model.Member{}).Where("id = ?", member.ID).Update("barcode", member.Barcode).Error; err != nil {
 					return fmt.Errorf("Не удалось сгенерировать штрихкод для участника %s %s %s: %w", member.Surname, member.Name, member.Middlename, err)
 				}

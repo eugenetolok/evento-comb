@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/eugenetolok/evento/pkg/model"
-	"github.com/eugenetolok/evento/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -53,7 +52,6 @@ func getMembersByGate(c echo.Context) error {
 }
 
 func removeGateFromMember(c echo.Context) error {
-	utils.MarkDeprecatedGet(c, "POST")
 	// 1. Parse and validate Member ID from the URL.
 	memberIDStr := c.Param("memberId")
 	memberID, err := uuid.Parse(memberIDStr)

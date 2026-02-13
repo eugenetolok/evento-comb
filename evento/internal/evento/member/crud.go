@@ -128,7 +128,11 @@ func createMember(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, dbErr)
 		}
 		if member.Barcode == "" {
-			member.Barcode = utils.MD5Hash(fmt.Sprintf("%sFFF300001001001", member.ID.String()))
+			barcode, barcodeErr := generateUniqueMemberBarcode(tx)
+			if barcodeErr != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Ошибка генерации штрихкода: %v", barcodeErr))
+			}
+			member.Barcode = barcode
 			if err := tx.Model(&model.Member{}).Where("id = ?", member.ID).Update("barcode", member.Barcode).Error; err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Ошибка генерации штрихкода: %v", err))
 			}

@@ -48,11 +48,39 @@ func syncEmptyMemberBarcodesOnce() {
 	}
 
 	for _, member := range members {
-		barcode := utils.MD5Hash(fmt.Sprintf("%sFFF300001001001", member.ID.String()))
+		barcode, err := generateUniqueMemberBarcodeForSync()
+		if err != nil {
+			log.Printf("startup barcode generation failed for member %s: %v", member.ID.String(), err)
+			continue
+		}
 		if err := db.Model(&model.Member{}).Where("id = ?", member.ID).Update("barcode", barcode).Error; err != nil {
 			log.Printf("startup barcode sync failed for member %s: %v", member.ID.String(), err)
 		}
 	}
+}
+
+func generateUniqueMemberBarcodeForSync() (string, error) {
+	const (
+		barcodeBytes       = 16
+		maxBarcodeAttempts = 8
+	)
+
+	for attempt := 0; attempt < maxBarcodeAttempts; attempt++ {
+		candidate := utils.GenerateRandomHex(barcodeBytes)
+		if candidate == "" {
+			continue
+		}
+
+		var count int64
+		if err := db.Model(&model.Member{}).Where("barcode = ?", candidate).Count(&count).Error; err != nil {
+			return "", err
+		}
+		if count == 0 {
+			return candidate, nil
+		}
+	}
+
+	return "", fmt.Errorf("failed to generate unique barcode after %d attempts", maxBarcodeAttempts)
 }
 
 func ensureUserFreezeScheduleColumns() {
