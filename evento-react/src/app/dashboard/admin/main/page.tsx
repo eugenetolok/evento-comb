@@ -133,6 +133,18 @@ export default function PricingPage() {
 							</Link>
 						</CardFooter>
 					</Card>
+					<Card className="col-span-12 sm:col-span-4 h-[200px] bg-gradient-to-tr from-green-600 to-blue-600">
+						<CardHeader className="absolute z-10 top-1 flex-col items-start">
+							<h4 className="text-white font-medium text-2xl">Email-шаблоны</h4>
+						</CardHeader>
+						<CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
+							<div>
+							</div>
+							<Link href="/dashboard/admin/email-templates" className={buttonStyles({ color: "primary", variant: "shadow" })}>
+								Редактировать письма
+							</Link>
+						</CardFooter>
+					</Card>
 				</div>
 			</div>
 		</div>

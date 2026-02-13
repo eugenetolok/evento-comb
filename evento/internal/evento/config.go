@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eugenetolok/evento/internal/evento/emailtemplate"
 	"github.com/eugenetolok/evento/pkg/model"
 	"github.com/eugenetolok/evento/pkg/smtp"
 	"github.com/eugenetolok/evento/pkg/utils"
@@ -59,13 +60,13 @@ func InitEvento(f model.Flags) {
 	}
 	if f.DropTable {
 		db.Migrator().DropTable(
-			model.User{}, model.Member{}, model.Company{}, model.Auto{}, model.Accreditation{}, model.Event{}, model.Gate{}, model.CompanyAccreditationLimit{}, model.CompanyEventLimit{}, model.CompanyGateLimit{}, model.MemberPass{}, model.MemberPrint{}, model.MemberHistory{}, model.CompanyHistory{}, model.AutoHistory{}, model.BadgeTemplate{})
+			model.User{}, model.Member{}, model.Company{}, model.Auto{}, model.Accreditation{}, model.Event{}, model.Gate{}, model.CompanyAccreditationLimit{}, model.CompanyEventLimit{}, model.CompanyGateLimit{}, model.MemberPass{}, model.MemberPrint{}, model.MemberHistory{}, model.CompanyHistory{}, model.AutoHistory{}, model.BadgeTemplate{}, model.EmailTemplate{})
 		log.Println("All tables are dropped")
 		os.Exit(0)
 	}
 	if f.Migrate {
 		db.AutoMigrate(
-			model.User{}, model.Member{}, model.Company{}, model.Auto{}, model.Accreditation{}, model.Event{}, model.Gate{}, model.CompanyAccreditationLimit{}, model.CompanyEventLimit{}, model.CompanyGateLimit{}, model.MemberPass{}, model.MemberPrint{}, model.MemberHistory{}, model.CompanyHistory{}, model.AutoHistory{}, model.BadgeTemplate{})
+			model.User{}, model.Member{}, model.Company{}, model.Auto{}, model.Accreditation{}, model.Event{}, model.Gate{}, model.CompanyAccreditationLimit{}, model.CompanyEventLimit{}, model.CompanyGateLimit{}, model.MemberPass{}, model.MemberPrint{}, model.MemberHistory{}, model.CompanyHistory{}, model.AutoHistory{}, model.BadgeTemplate{}, model.EmailTemplate{})
 		log.Println("All tables are migrated")
 		os.Exit(0)
 	}
@@ -91,6 +92,9 @@ func InitEvento(f model.Flags) {
 	ensureUserFreezeScheduleColumns()
 	syncDerivedCompanyFieldsOnce()
 	syncEmptyMemberBarcodesOnce()
+	if err := emailtemplate.EnsureAndLoad(db); err != nil {
+		log.Fatalf("email templates init failed: %v", err)
+	}
 }
 
 func updateConfig() {

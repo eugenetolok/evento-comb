@@ -9,6 +9,7 @@ import (
 	"github.com/eugenetolok/evento/internal/evento/auto"
 	"github.com/eugenetolok/evento/internal/evento/badge"
 	"github.com/eugenetolok/evento/internal/evento/company"
+	"github.com/eugenetolok/evento/internal/evento/emailtemplate"
 	"github.com/eugenetolok/evento/internal/evento/event"
 	"github.com/eugenetolok/evento/internal/evento/gate"
 	"github.com/eugenetolok/evento/internal/evento/member"
@@ -68,4 +69,5 @@ func Routes(e *echo.Echo) {
 	company.InitCompanies(e.Group("/api/companies"), db, jwtConfig)
 	member.InitMembers(e.Group("/api/members"), db, jwtConfig, photoStorageDir)
 	accreditation.InitAccreditations(e.Group("/api/accreditations"), db, jwtConfig)
+	emailtemplate.InitEmailTemplates(e.Group("/api/email-templates"), db, jwtConfig)
 }
