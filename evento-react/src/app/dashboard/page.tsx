@@ -2,7 +2,7 @@
 import { Link } from "@heroui/link";
 import { button as buttonStyles } from "@heroui/theme";
 import { siteConfig } from "@/config/site";
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { AppContext } from './context';
 import VkLiquidMainBackground from "@/components/backgrounds/vkLiquidMain";
 
@@ -63,7 +63,7 @@ export default function Home() {
 					</Link>
 					{roleButtonData ? (
 						<Link
-							className={buttonStyles({ variant: "bordered" }) + " col-span-12 sm:col-span-6"}
+							className={buttonStyles({ variant: "bordered" }) + " text-white col-span-12 sm:col-span-6"}
 							href={roleButtonData?.url}
 						>
 							{roleButtonData?.title}
