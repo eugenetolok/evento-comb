@@ -89,3 +89,16 @@ report_settings:
     anomaly_threshold: 5
     overload_percent_red: 100
     overload_percent_yellow: 85
+
+ai_assistant:
+  enabled: false
+  provider: openrouter
+  openrouter_base_url: https://openrouter.ai/api/v1
+  openrouter_model: openai/gpt-4o-mini
+  openrouter_api_key: ""
+  openrouter_referer: https://vkfestreg.ru
+  openrouter_app_title: evento-ai-assistant
+  llm_temperature: 0.1
+  llm_timeout_ms: 15000
+  query_timeout_ms: 5000
+  max_rows: 500

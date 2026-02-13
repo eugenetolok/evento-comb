@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eugenetolok/evento/internal/evento/aiassistant"
 	"github.com/eugenetolok/evento/internal/evento/emailtemplate"
 	"github.com/eugenetolok/evento/pkg/model"
 	"github.com/eugenetolok/evento/pkg/smtp"
@@ -92,6 +93,9 @@ func InitEvento(f model.Flags) {
 	ensureUserFreezeScheduleColumns()
 	syncDerivedCompanyFieldsOnce()
 	syncEmptyMemberBarcodesOnce()
+	if err := aiassistant.EnsureReadOnlyViews(db); err != nil {
+		log.Fatalf("ai assistant views init failed: %v", err)
+	}
 	if err := emailtemplate.EnsureAndLoad(db); err != nil {
 		log.Fatalf("email templates init failed: %v", err)
 	}
@@ -235,6 +239,37 @@ func applyDefaultAppSettings(settings *model.AppSettings) {
 	if settings.ReportSettings.Dashboard.OverloadPercentYellow <= 0 {
 		settings.ReportSettings.Dashboard.OverloadPercentYellow = 85
 	}
+
+	if settings.AIAssistantSettings.Provider == "" {
+		settings.AIAssistantSettings.Provider = "openrouter"
+	}
+	if settings.AIAssistantSettings.OpenRouterBaseURL == "" {
+		settings.AIAssistantSettings.OpenRouterBaseURL = "https://openrouter.ai/api/v1"
+	}
+	if settings.AIAssistantSettings.OpenRouterModel == "" {
+		settings.AIAssistantSettings.OpenRouterModel = "openai/gpt-4o-mini"
+	}
+	if settings.AIAssistantSettings.OpenRouterReferer == "" {
+		settings.AIAssistantSettings.OpenRouterReferer = "https://vkfestreg.ru"
+	}
+	if settings.AIAssistantSettings.OpenRouterAppTitle == "" {
+		settings.AIAssistantSettings.OpenRouterAppTitle = "evento-ai-assistant"
+	}
+	if settings.AIAssistantSettings.LLMTimeoutMS <= 0 {
+		settings.AIAssistantSettings.LLMTimeoutMS = 15000
+	}
+	if settings.AIAssistantSettings.QueryTimeoutMS <= 0 {
+		settings.AIAssistantSettings.QueryTimeoutMS = 5000
+	}
+	if settings.AIAssistantSettings.MaxRows <= 0 {
+		settings.AIAssistantSettings.MaxRows = 500
+	}
+	if settings.AIAssistantSettings.LLMTemperature < 0 {
+		settings.AIAssistantSettings.LLMTemperature = 0
+	}
+	if settings.AIAssistantSettings.LLMTemperature > 1 {
+		settings.AIAssistantSettings.LLMTemperature = 0.1
+	}
 }
 
 func applyEnvOverrides(settings *model.AppSettings) {
@@ -253,6 +288,29 @@ func applyEnvOverrides(settings *model.AppSettings) {
 	applyIntEnv("EVENTO_SMTP_PORT", &settings.MailSettings.Port)
 	applyIntEnv("EVENTO_AUTH_RATE_LIMIT_RPS", &settings.SiteSettings.AuthRateLimitRPS)
 	applyIntEnv("EVENTO_AUTH_RATE_LIMIT_BURST", &settings.SiteSettings.AuthRateLimitBurst)
+	applyIntEnv("EVENTO_AI_LLM_TIMEOUT_MS", &settings.AIAssistantSettings.LLMTimeoutMS)
+	applyIntEnv("EVENTO_AI_QUERY_TIMEOUT_MS", &settings.AIAssistantSettings.QueryTimeoutMS)
+	applyIntEnv("EVENTO_AI_MAX_ROWS", &settings.AIAssistantSettings.MaxRows)
+
+	applyStringEnv("EVENTO_AI_PROVIDER", &settings.AIAssistantSettings.Provider)
+	applyStringEnv("EVENTO_OPENROUTER_BASE_URL", &settings.AIAssistantSettings.OpenRouterBaseURL)
+	applyStringEnv("EVENTO_OPENROUTER_MODEL", &settings.AIAssistantSettings.OpenRouterModel)
+	applyStringEnv("EVENTO_OPENROUTER_API_KEY", &settings.AIAssistantSettings.OpenRouterAPIKey)
+	applyStringEnv("EVENTO_OPENROUTER_REFERER", &settings.AIAssistantSettings.OpenRouterReferer)
+	applyStringEnv("EVENTO_OPENROUTER_APP_TITLE", &settings.AIAssistantSettings.OpenRouterAppTitle)
+
+	if enabledRaw := strings.TrimSpace(os.Getenv("EVENTO_AI_ENABLED")); enabledRaw != "" {
+		settings.AIAssistantSettings.Enabled = strings.EqualFold(enabledRaw, "true") || enabledRaw == "1"
+	}
+
+	if tempRaw := strings.TrimSpace(os.Getenv("EVENTO_AI_TEMPERATURE")); tempRaw != "" {
+		parsed, err := strconv.ParseFloat(tempRaw, 64)
+		if err != nil {
+			log.Printf("invalid float env EVENTO_AI_TEMPERATURE=%q: %v", tempRaw, err)
+		} else {
+			settings.AIAssistantSettings.LLMTemperature = parsed
+		}
+	}
 
 	if origins := strings.TrimSpace(os.Getenv("EVENTO_CORS_ALLOW_ORIGINS")); origins != "" {
 		settings.SiteSettings.CORSAllowOrigins = splitCommaSeparated(origins)
@@ -313,6 +371,20 @@ func validateSecuritySettings(settings *model.AppSettings) error {
 	}
 	if settings.SiteSettings.AuthRateLimitBurst <= 0 {
 		return fmt.Errorf("site_settings.auth_rate_limit_burst must be greater than 0")
+	}
+	if settings.AIAssistantSettings.Enabled {
+		if strings.ToLower(strings.TrimSpace(settings.AIAssistantSettings.Provider)) != "openrouter" {
+			return fmt.Errorf("ai_assistant.provider must be \"openrouter\"")
+		}
+		if strings.TrimSpace(settings.AIAssistantSettings.OpenRouterAPIKey) == "" {
+			return fmt.Errorf("ai_assistant.openrouter_api_key is required when ai_assistant.enabled=true")
+		}
+		if strings.TrimSpace(settings.AIAssistantSettings.OpenRouterModel) == "" {
+			return fmt.Errorf("ai_assistant.openrouter_model is required when ai_assistant.enabled=true")
+		}
+		if settings.AIAssistantSettings.MaxRows <= 0 {
+			return fmt.Errorf("ai_assistant.max_rows must be greater than 0")
+		}
 	}
 	return nil
 }

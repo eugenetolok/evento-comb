@@ -1,7 +1,6 @@
 'use client';
 import React from "react";
-import { Card, CardFooter, Image, Button, CardHeader } from "@heroui/react";
-import { title, subtitle } from "@/components/primitives";
+import { Card, CardFooter, CardHeader } from "@heroui/react";
 import { button as buttonStyles } from "@heroui/theme";
 import { Link } from "@heroui/link";
 
@@ -123,25 +122,25 @@ export default function PricingPage() {
 					</Card>
 					<Card className="col-span-12 sm:col-span-4 h-[200px]  bg-gradient-to-tr from-purple-600 to-blue-600">
 						<CardHeader className="absolute z-10 top-1 flex-col items-start">
-							<h4 className="text-white font-medium text-2xl">Шаблоны бейджей</h4>
+							<h4 className="text-white font-medium text-2xl">Шаблоны</h4>
 						</CardHeader>
 						<CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
 							<div>
 							</div>
-							<Link href="/dashboard/admin/badges" className={buttonStyles({ color: "primary", variant: "shadow" })}>
-								Редактировать шаблоны
+							<Link href="/dashboard/admin/templates" className={buttonStyles({ color: "primary", variant: "shadow" })}>
+								Открыть подменю
 							</Link>
 						</CardFooter>
 					</Card>
 					<Card className="col-span-12 sm:col-span-4 h-[200px] bg-gradient-to-tr from-green-600 to-blue-600">
 						<CardHeader className="absolute z-10 top-1 flex-col items-start">
-							<h4 className="text-white font-medium text-2xl">Email-шаблоны</h4>
+							<h4 className="text-white font-medium text-2xl">AI-ассистент</h4>
 						</CardHeader>
 						<CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
 							<div>
 							</div>
-							<Link href="/dashboard/admin/email-templates" className={buttonStyles({ color: "primary", variant: "shadow" })}>
-								Редактировать письма
+							<Link href="/dashboard/admin/assistant" className={buttonStyles({ color: "primary", variant: "shadow" })}>
+								Открыть ассистента
 							</Link>
 						</CardFooter>
 					</Card>

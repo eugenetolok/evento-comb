@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/eugenetolok/evento/internal/evento/accreditation"
+	"github.com/eugenetolok/evento/internal/evento/aiassistant"
 	"github.com/eugenetolok/evento/internal/evento/auto"
 	"github.com/eugenetolok/evento/internal/evento/badge"
 	"github.com/eugenetolok/evento/internal/evento/company"
@@ -70,4 +71,5 @@ func Routes(e *echo.Echo) {
 	member.InitMembers(e.Group("/api/members"), db, jwtConfig, photoStorageDir)
 	accreditation.InitAccreditations(e.Group("/api/accreditations"), db, jwtConfig)
 	emailtemplate.InitEmailTemplates(e.Group("/api/email-templates"), db, jwtConfig)
+	aiassistant.InitAIAssistant(e.Group("/api/ai-assistant"), jwtConfig, appSettings.AIAssistantSettings, appSettings.SiteSettings.DBPath)
 }

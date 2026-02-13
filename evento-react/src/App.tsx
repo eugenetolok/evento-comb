@@ -32,7 +32,9 @@ import AutoOperatorPage from "@/app/dashboard/autos/[id]/operator/page";
 import AdminMainPage from "@/app/dashboard/admin/main/page";
 import AdminKickPage from "@/app/dashboard/admin/kick/page";
 import AdminCompanyFreezePage from "@/app/dashboard/admin/company-freeze/page";
+import AdminTemplatesPage from "@/app/dashboard/admin/templates/page";
 import AdminEmailTemplatesPage from "@/app/dashboard/admin/email-templates/page";
+import AdminAssistantPage from "@/app/dashboard/admin/assistant/page";
 import AdminReportsPage from "@/app/dashboard/admin/reports/page";
 import AdminUsersPage from "@/app/dashboard/admin/users/page";
 import AdminUserPage from "@/app/dashboard/admin/users/[id]/page";
@@ -261,10 +263,26 @@ function App() {
       <Route
         element={
           <DashboardRoute>
+            <AdminTemplatesPage />
+          </DashboardRoute>
+        }
+        path="/dashboard/admin/templates"
+      />
+      <Route
+        element={
+          <DashboardRoute>
             <AdminEmailTemplatesPage />
           </DashboardRoute>
         }
         path="/dashboard/admin/email-templates"
+      />
+      <Route
+        element={
+          <DashboardRoute>
+            <AdminAssistantPage />
+          </DashboardRoute>
+        }
+        path="/dashboard/admin/assistant"
       />
       <Route
         element={

@@ -49,10 +49,24 @@ type (
 	ReportSettings struct {
 		Dashboard ReportDashboardSettings `yaml:"dashboard" json:"dashboard"`
 	}
+	AIAssistantSettings struct {
+		Enabled            bool    `yaml:"enabled" json:"enabled"`
+		Provider           string  `yaml:"provider" json:"provider"`
+		OpenRouterBaseURL  string  `yaml:"openrouter_base_url" json:"openRouterBaseUrl"`
+		OpenRouterModel    string  `yaml:"openrouter_model" json:"openRouterModel"`
+		OpenRouterAPIKey   string  `yaml:"openrouter_api_key" json:"-"`
+		OpenRouterReferer  string  `yaml:"openrouter_referer" json:"openRouterReferer"`
+		OpenRouterAppTitle string  `yaml:"openrouter_app_title" json:"openRouterAppTitle"`
+		LLMTemperature     float64 `yaml:"llm_temperature" json:"llmTemperature"`
+		LLMTimeoutMS       int     `yaml:"llm_timeout_ms" json:"llmTimeoutMs"`
+		QueryTimeoutMS     int     `yaml:"query_timeout_ms" json:"queryTimeoutMs"`
+		MaxRows            int     `yaml:"max_rows" json:"maxRows"`
+	}
 	AppSettings struct {
-		SiteSettings     `yaml:"site_settings"`
-		MailSettings     `yaml:"mail_settings"`
-		FrontendSettings `yaml:"frontend_settings"`
-		ReportSettings   `yaml:"report_settings"`
+		SiteSettings        `yaml:"site_settings"`
+		MailSettings        `yaml:"mail_settings"`
+		FrontendSettings    `yaml:"frontend_settings"`
+		ReportSettings      `yaml:"report_settings"`
+		AIAssistantSettings `yaml:"ai_assistant"`
 	}
 )
