@@ -129,7 +129,7 @@ export default function AddCompany({ params }: any) {
 
     const handleFreezeToggle = async () => {
         try {
-            await axiosInstanceAuth.get(`/api/companies/${id}/freeze`);
+            await axiosInstanceAuth.post(`/api/companies/${id}/freeze`);
             setCompany((prevCompany: any) => ({
                 ...prevCompany,
                 user: { ...prevCompany.user, frozen: !prevCompany.user.frozen }

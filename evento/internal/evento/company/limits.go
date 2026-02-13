@@ -1,7 +1,6 @@
 package company
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"sort"
@@ -10,30 +9,19 @@ import (
 	"github.com/eugenetolok/evento/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 func getCompanyLimits(c echo.Context) error {
-	companyID, err := uuid.Parse(c.QueryParam("company_id"))
-	if err != nil || c.QueryParam("company_id") == "" {
-		userID, _ := utils.GetUser(c)
-		var user model.User
-		if err := db.First(&user, userID).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.String(http.StatusNotFound, `{"error":"user is not found"}`)
-			}
-			return c.String(http.StatusInternalServerError, err.Error())
+	companyID, err := utils.ResolveCompanyIDForManage(c, db, c.QueryParam("company_id"))
+	if err != nil {
+		if httpErr, ok := err.(*echo.HTTPError); ok {
+			return c.String(httpErr.Code, fmt.Sprint(httpErr.Message))
 		}
-		if user.CompanyID == uuid.Nil {
-			return c.String(http.StatusBadRequest, `{"error":"company not found"}`)
-		}
-		companyID = user.CompanyID
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
+
 	var company model.Company
-	if errCompany := db.Preload("AccreditationLimits").Preload("EventLimits").Preload("GateLimits").First(&company, companyID).Error; errCompany != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.String(http.StatusNotFound, `{"error":"company is wrong"}`)
-		}
+	if err = db.Preload("AccreditationLimits").Preload("EventLimits").Preload("GateLimits").First(&company, companyID).Error; err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
 

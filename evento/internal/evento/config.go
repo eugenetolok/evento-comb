@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -84,6 +85,9 @@ func InitEvento(f model.Flags) {
 		}
 		os.Exit(0)
 	}
+	if err := validateSecuritySettings(&appSettings); err != nil {
+		log.Fatal(err)
+	}
 	ensureUserFreezeScheduleColumns()
 	syncDerivedCompanyFieldsOnce()
 	syncEmptyMemberBarcodesOnce()
@@ -94,6 +98,7 @@ func updateConfig() {
 		log.Println("settings invalid")
 	}
 	applyDefaultAppSettings(&appSettings)
+	applyEnvOverrides(&appSettings)
 }
 
 func applyDefaultAppSettings(settings *model.AppSettings) {
@@ -105,8 +110,19 @@ func applyDefaultAppSettings(settings *model.AppSettings) {
 	if settings.SiteSettings.PhotoStoragePath == "" {
 		settings.SiteSettings.PhotoStoragePath = "photos"
 	}
-	if settings.SiteSettings.SecretJWT == "" {
-		settings.SiteSettings.SecretJWT = "change-me"
+	if len(settings.SiteSettings.CORSAllowOrigins) == 0 {
+		settings.SiteSettings.CORSAllowOrigins = []string{
+			"http://localhost:5173",
+			"http://localhost:5174",
+			"http://127.0.0.1:5173",
+			"http://127.0.0.1:5174",
+		}
+	}
+	if settings.SiteSettings.AuthRateLimitRPS <= 0 {
+		settings.SiteSettings.AuthRateLimitRPS = 5
+	}
+	if settings.SiteSettings.AuthRateLimitBurst <= 0 {
+		settings.SiteSettings.AuthRateLimitBurst = 10
 	}
 
 	if settings.FrontendSettings.Name == "" {
@@ -215,6 +231,92 @@ func applyDefaultAppSettings(settings *model.AppSettings) {
 	if settings.ReportSettings.Dashboard.OverloadPercentYellow <= 0 {
 		settings.ReportSettings.Dashboard.OverloadPercentYellow = 85
 	}
+}
+
+func applyEnvOverrides(settings *model.AppSettings) {
+	applyStringEnv("EVENTO_DB_PATH", &settings.SiteSettings.DBPath)
+	applyStringEnv("EVENTO_PHOTO_STORAGE_PATH", &settings.SiteSettings.PhotoStoragePath)
+	applyStringEnv("EVENTO_SECRET_JWT", &settings.SiteSettings.SecretJWT)
+
+	applyStringEnv("EVENTO_SMTP_FROM_NAME", &settings.MailSettings.FromName)
+	applyStringEnv("EVENTO_SMTP_FROM", &settings.MailSettings.From)
+	applyStringEnv("EVENTO_SMTP_HOST", &settings.MailSettings.SMTP)
+	applyStringEnv("EVENTO_SMTP_USER", &settings.MailSettings.User)
+	applyStringEnv("EVENTO_SMTP_PASSWORD", &settings.MailSettings.Password)
+	applyStringEnv("EVENTO_SMTP_DOMAIN", &settings.MailSettings.Domain)
+	applyStringEnv("EVENTO_SMTP_CITY", &settings.MailSettings.City)
+
+	applyIntEnv("EVENTO_SMTP_PORT", &settings.MailSettings.Port)
+	applyIntEnv("EVENTO_AUTH_RATE_LIMIT_RPS", &settings.SiteSettings.AuthRateLimitRPS)
+	applyIntEnv("EVENTO_AUTH_RATE_LIMIT_BURST", &settings.SiteSettings.AuthRateLimitBurst)
+
+	if origins := strings.TrimSpace(os.Getenv("EVENTO_CORS_ALLOW_ORIGINS")); origins != "" {
+		settings.SiteSettings.CORSAllowOrigins = splitCommaSeparated(origins)
+	}
+}
+
+func applyStringEnv(key string, target *string) {
+	if value := strings.TrimSpace(os.Getenv(key)); value != "" {
+		*target = value
+	}
+}
+
+func applyIntEnv(key string, target *int) {
+	value := strings.TrimSpace(os.Getenv(key))
+	if value == "" {
+		return
+	}
+	parsed, err := strconv.Atoi(value)
+	if err != nil {
+		log.Printf("invalid integer env %s=%q: %v", key, value, err)
+		return
+	}
+	*target = parsed
+}
+
+func splitCommaSeparated(raw string) []string {
+	parts := strings.Split(raw, ",")
+	result := make([]string, 0, len(parts))
+	seen := make(map[string]struct{}, len(parts))
+	for _, part := range parts {
+		value := strings.TrimSpace(part)
+		if value == "" {
+			continue
+		}
+		if _, exists := seen[value]; exists {
+			continue
+		}
+		seen[value] = struct{}{}
+		result = append(result, value)
+	}
+	return result
+}
+
+func validateSecuritySettings(settings *model.AppSettings) error {
+	secret := strings.TrimSpace(settings.SiteSettings.SecretJWT)
+	if secret == "" || strings.EqualFold(secret, "change-me") {
+		return fmt.Errorf("unsafe site_settings.secret_jwt: set a strong value in app.yaml or EVENTO_SECRET_JWT")
+	}
+	if len(secret) < 24 {
+		return fmt.Errorf("site_settings.secret_jwt is too short: minimum length is 24 characters")
+	}
+	settings.SiteSettings.CORSAllowOrigins = splitCommaSeparated(strings.Join(settings.SiteSettings.CORSAllowOrigins, ","))
+	if len(settings.SiteSettings.CORSAllowOrigins) == 0 {
+		return fmt.Errorf("site_settings.cors_allow_origins must contain at least one allowed origin")
+	}
+	if settings.SiteSettings.AuthRateLimitRPS <= 0 {
+		return fmt.Errorf("site_settings.auth_rate_limit_rps must be greater than 0")
+	}
+	if settings.SiteSettings.AuthRateLimitBurst <= 0 {
+		return fmt.Errorf("site_settings.auth_rate_limit_burst must be greater than 0")
+	}
+	return nil
+}
+
+func GetCORSAllowOrigins() []string {
+	origins := make([]string, len(appSettings.SiteSettings.CORSAllowOrigins))
+	copy(origins, appSettings.SiteSettings.CORSAllowOrigins)
+	return origins
 }
 
 // Function to prompt user for username and password using promptui

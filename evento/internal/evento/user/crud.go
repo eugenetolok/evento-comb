@@ -2,7 +2,6 @@ package user
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -55,7 +54,6 @@ func createUser(c echo.Context) error {
 		log.Println("password hashing failed", err)
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
-	fmt.Println("user", user)
 	user.Password = string(hashedPassword)
 	if err := db.Create(&user).Error; err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())

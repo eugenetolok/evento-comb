@@ -66,4 +66,14 @@ func ensureUserFreezeScheduleColumns() {
 			log.Printf("unable to add users.frozen_action column: %v", err)
 		}
 	}
+	if !db.Migrator().HasColumn(&model.User{}, "PasswordResetTokenHash") {
+		if err := db.Migrator().AddColumn(&model.User{}, "PasswordResetTokenHash"); err != nil {
+			log.Printf("unable to add users.password_reset_token_hash column: %v", err)
+		}
+	}
+	if !db.Migrator().HasColumn(&model.User{}, "PasswordResetExpiresAt") {
+		if err := db.Migrator().AddColumn(&model.User{}, "PasswordResetExpiresAt"); err != nil {
+			log.Printf("unable to add users.password_reset_expires_at column: %v", err)
+		}
+	}
 }

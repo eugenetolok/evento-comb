@@ -2,11 +2,14 @@ package model
 
 type (
 	SiteSettings struct {
-		DBPath           string `yaml:"db_path"`
-		Debug            bool   `yaml:"debug"`
-		AdminToken       string `yaml:"admin_token"`
-		SecretJWT        string `yaml:"secret_jwt"`
-		PhotoStoragePath string `yaml:"photo_storage_path"`
+		DBPath             string   `yaml:"db_path"`
+		Debug              bool     `yaml:"debug"`
+		AdminToken         string   `yaml:"admin_token"`
+		SecretJWT          string   `yaml:"secret_jwt"`
+		PhotoStoragePath   string   `yaml:"photo_storage_path"`
+		CORSAllowOrigins   []string `yaml:"cors_allow_origins"`
+		AuthRateLimitRPS   int      `yaml:"auth_rate_limit_rps"`
+		AuthRateLimitBurst int      `yaml:"auth_rate_limit_burst"`
 	}
 	MailSettings struct {
 		FromName string `yaml:"from_name"`

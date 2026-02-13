@@ -5,12 +5,14 @@ import (
 	"net/http"
 
 	"github.com/eugenetolok/evento/pkg/model"
+	"github.com/eugenetolok/evento/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 func block(c echo.Context) error {
+	utils.MarkDeprecatedGet(c, "POST")
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, `{"error":"invalid id"}`)

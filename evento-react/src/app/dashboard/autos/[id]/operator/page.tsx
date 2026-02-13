@@ -30,7 +30,7 @@ const Car = ({ params }: any) => {
     }, [id]);
 
     const handleGivePass = () => {
-        axiosInstanceAuth.get(`/api/autos/givePass/${car.id}`)
+        axiosInstanceAuth.post(`/api/autos/givePass/${car.id}`)
             .then(response => {
                 setCar((prevState: any) => ({
                     ...prevState,
@@ -44,7 +44,7 @@ const Car = ({ params }: any) => {
     };
 
     const handleGivePass2 = () => {
-        axiosInstanceAuth.get(`/api/autos/givePass2/${car.id}`)
+        axiosInstanceAuth.post(`/api/autos/givePass2/${car.id}`)
             .then(response => {
                 setCar((prevState: any) => ({
                     ...prevState,

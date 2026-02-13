@@ -73,19 +73,40 @@ const User = ({ params }: any) => {
     };
 
     const handleResetPassword = async () => {
-        if (newPassword !== repeatPassword) {
+        if (newPassword !== '' && newPassword !== repeatPassword) {
             toast.error("Пароли не совпадают");
+            return;
+        }
+        if (!sendToEmail && newPassword.trim() === '') {
+            toast.error("Введите новый пароль или включите отправку ссылки на email");
+            return;
+        }
+        if (sendToEmail && resetEmail.trim() === '') {
+            toast.error("Укажите email получателя");
             return;
         }
 
         try {
             const response = await axiosInstanceAuth.post(`/api/users/resetPassword/${user.id}`, {
-                password: newPassword,
-                recepient_email: sendToEmail ? resetEmail : "",
+                password: newPassword.trim(),
+                recipient_email: sendToEmail ? resetEmail.trim() : "",
+                recepient_email: sendToEmail ? resetEmail.trim() : "",
             });
 
             if (response.status === 200) {
-                toast.success("Пароль успешно сброшен");
+                const payload = response.data as {
+                    password_updated?: boolean;
+                    reset_email_sent?: boolean;
+                };
+                if (payload.password_updated && payload.reset_email_sent) {
+                    toast.success("Пароль обновлён и ссылка отправлена на email");
+                } else if (payload.password_updated) {
+                    toast.success("Пароль успешно обновлён");
+                } else if (payload.reset_email_sent) {
+                    toast.success("Ссылка для сброса пароля отправлена");
+                } else {
+                    toast.success("Запрос выполнен");
+                }
                 onResetClose();
             } else {
                 toast.error(`Ошибка: ${response.statusText}`);

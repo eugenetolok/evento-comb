@@ -61,6 +61,7 @@ func getEditorMembers(c echo.Context) error {
 }
 
 func setState(c echo.Context) error {
+	utils.MarkDeprecatedGet(c, "POST")
 	id := c.Param("id")
 	var member model.Member
 	if err := db.First(&member, id).Error; err != nil {
@@ -211,6 +212,7 @@ func membersFillLite(c echo.Context, member *model.Member, eventIDs, gateIDs []u
 
 // print member
 func print(c echo.Context) error {
+	utils.MarkDeprecatedGet(c, "POST")
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, `{"error":"invalid id"}`)
@@ -264,6 +266,7 @@ func massPrint(c echo.Context) error {
 
 // member give bangle
 func giveBangle(c echo.Context) error {
+	utils.MarkDeprecatedGet(c, "POST")
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, `{"error":"invalid id"}`)

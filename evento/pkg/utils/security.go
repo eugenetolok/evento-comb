@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/eugenetolok/evento/pkg/model"
@@ -12,6 +13,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
+
+type companyPermissionChecker func(c echo.Context, company model.Company) bool
 
 // UUIDMiddleware validates if the ':id' parameter is a valid UUID.
 func UUIDMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -59,10 +62,64 @@ func GetUser(c echo.Context) (uuid.UUID, string) {
 	return claims.ID, claims.Role
 }
 
+// ResolveCompanyIDForManage safely resolves company_id from query/user context
+// and verifies that current user can manage this company.
+func ResolveCompanyIDForManage(c echo.Context, db *gorm.DB, rawCompanyID string) (uuid.UUID, error) {
+	return resolveScopedCompanyID(c, db, rawCompanyID, CheckCompanyManagePermission)
+}
+
+func resolveScopedCompanyID(c echo.Context, db *gorm.DB, rawCompanyID string, checker companyPermissionChecker) (uuid.UUID, error) {
+	companyID, err := parseOptionalCompanyID(rawCompanyID)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if companyID == uuid.Nil {
+		userID, _ := GetUser(c)
+		var user model.User
+		if err := db.Select("id", "company_id").First(&user, userID).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return uuid.Nil, echo.NewHTTPError(http.StatusNotFound, `{"error":"user is not found"}`)
+			}
+			return uuid.Nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		if user.CompanyID == uuid.Nil {
+			return uuid.Nil, echo.NewHTTPError(http.StatusBadRequest, `{"error":"company not found"}`)
+		}
+		companyID = user.CompanyID
+	}
+
+	var company model.Company
+	if err := db.Preload("User").First(&company, companyID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return uuid.Nil, echo.NewHTTPError(http.StatusNotFound, `{"error":"company is not found"}`)
+		}
+		return uuid.Nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	if !checker(c, company) {
+		return uuid.Nil, echo.NewHTTPError(http.StatusForbidden, `{"error":"user does not have enough permissions"}`)
+	}
+
+	return companyID, nil
+}
+
+func parseOptionalCompanyID(rawCompanyID string) (uuid.UUID, error) {
+	value := strings.TrimSpace(rawCompanyID)
+	if value == "" {
+		return uuid.Nil, nil
+	}
+
+	companyID, err := uuid.Parse(value)
+	if err != nil {
+		return uuid.Nil, echo.NewHTTPError(http.StatusBadRequest, `{"error":"invalid company_id"}`)
+	}
+
+	return companyID, nil
+}
+
 // CheckCompanyManagePermission ...
 func CheckCompanyManagePermission(c echo.Context, company model.Company) bool {
 	userID, userRole := GetUser(c)
-	fmt.Println("user ID:", userID, "user Role:", userRole)
 	if userRole == "admin" {
 		return true
 	}
@@ -78,7 +135,6 @@ func CheckCompanyManagePermission(c echo.Context, company model.Company) bool {
 // CheckCompanyGetPermission ...
 func CheckCompanyGetPermission(c echo.Context, company model.Company) bool {
 	userID, userRole := GetUser(c)
-	fmt.Println("user ID:", userID, "user Role:", userRole)
 	if userRole == "admin" || userRole == "operator" || userRole == "monitoring" {
 		return true
 	}
@@ -119,4 +175,17 @@ func CheckUserWritePermission(c echo.Context, db *gorm.DB) bool {
 		}).Error
 	}
 	return !user.Frozen
+}
+
+// MarkDeprecatedGet adds deprecation headers for legacy mutating GET endpoints.
+func MarkDeprecatedGet(c echo.Context, replacementMethod string) {
+	if c.Request().Method != http.MethodGet {
+		return
+	}
+	c.Response().Header().Set("Deprecation", "true")
+	c.Response().Header().Set("Sunset", time.Now().AddDate(0, 1, 0).UTC().Format(time.RFC1123))
+	if replacementMethod != "" {
+		c.Response().Header().Set("X-API-Replacement", replacementMethod)
+	}
+	c.Response().Header().Add("Warning", `299 - "Deprecated API: mutating GET endpoint, switch to POST"`)
 }

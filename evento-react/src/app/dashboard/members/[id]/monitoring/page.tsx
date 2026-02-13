@@ -19,7 +19,7 @@ const Member = ({ params }: any) => {
 
 
     const handleBlock = () => {
-        axiosInstanceAuth.get(urlBangle)
+        axiosInstanceAuth.post(urlBangle)
             .then(response => {
                 setMember((prevState: any) => ({
                     ...prevState,

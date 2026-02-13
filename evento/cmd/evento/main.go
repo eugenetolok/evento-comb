@@ -22,15 +22,19 @@ func init() {
 }
 
 func main() {
+	// init config/db
+	evento.InitEvento(flags)
+
 	e := echo.New()
 
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
+	e.Use(middleware.Secure())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		Skipper:       middleware.DefaultSkipper,
-		AllowOrigins:  []string{"*"},
+		AllowOrigins:  evento.GetCORSAllowOrigins(),
 		AllowMethods:  []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 		ExposeHeaders: []string{"Content-Disposition", "Content-Type", "Content-Length"},
 	}))
@@ -42,9 +46,6 @@ func main() {
 	// 	Browse: false,
 	// 	HTML5:  true,
 	// }))
-
-	// init poravkino
-	evento.InitEvento(flags)
 
 	evento.Routes(e)
 

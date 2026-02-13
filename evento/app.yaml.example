@@ -2,8 +2,15 @@ site_settings:
   db_path: test.db
   debug: false
   admin_token: ""
-  secret_jwt: change-me
+  secret_jwt: vkfest-local-jwt-secret-please-change-in-production-2026
   photo_storage_path: photos
+  cors_allow_origins:
+    - http://localhost:5173
+    - http://localhost:5174
+    - http://127.0.0.1:5173
+    - http://127.0.0.1:5174
+  auth_rate_limit_rps: 5
+  auth_rate_limit_burst: 10
 
 mail_settings:
   from_name: VK FEST

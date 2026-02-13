@@ -119,7 +119,7 @@ const Member = ({ params }: any) => {
 
             axios.post(`${printerUrl}/api/generate/badge?direct=true`, badgeRequest)
                 .then(printResponse => {
-                    axiosInstanceAuth.get(urlPrint)
+                    axiosInstanceAuth.post(urlPrint)
                         .then(response => {
                             setMember((prevState: any) => ({
                                 ...prevState,
@@ -193,7 +193,7 @@ const Member = ({ params }: any) => {
     };
 
     const handleGiveBangle = () => {
-        axiosInstanceAuth.get(urlBangle)
+        axiosInstanceAuth.post(urlBangle)
             .then(response => {
                 setMember((prevState: any) => ({
                     ...prevState,

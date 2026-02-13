@@ -41,19 +41,40 @@ const CredsModal = ({ company }: any) => {
             return;
         }
 
-        if (newPassword !== repeatPassword) {
+        if (newPassword !== '' && newPassword !== repeatPassword) {
             toast.error("Пароли не совпадают");
+            return;
+        }
+        if (!sendToEmail && newPassword.trim() === '') {
+            toast.error("Введите новый пароль или включите отправку ссылки на email");
+            return;
+        }
+        if (sendToEmail && email.trim() === '') {
+            toast.error("Укажите email получателя");
             return;
         }
 
         try {
             const response = await axiosInstanceAuth.post(`/api/users/resetPassword/${company.user.id}`, {
-                password: newPassword,
-                recepient_email: sendToEmail ? email : "",
+                password: newPassword.trim(),
+                recipient_email: sendToEmail ? email.trim() : "",
+                recepient_email: sendToEmail ? email.trim() : "",
             });
 
             if (response.status === 200) {
-                toast.success('Пароль успешно изменён');
+                const payload = response.data as {
+                    password_updated?: boolean;
+                    reset_email_sent?: boolean;
+                };
+                if (payload.password_updated && payload.reset_email_sent) {
+                    toast.success("Пароль обновлён и ссылка отправлена на email");
+                } else if (payload.password_updated) {
+                    toast.success("Пароль успешно изменён");
+                } else if (payload.reset_email_sent) {
+                    toast.success("Ссылка для сброса пароля отправлена");
+                } else {
+                    toast.success("Запрос выполнен");
+                }
                 onClose();
             } else {
                 toast.error(`Ошибка: ${response.statusText}`);

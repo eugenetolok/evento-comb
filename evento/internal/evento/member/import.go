@@ -20,22 +20,14 @@ import (
 )
 
 func generateTemplate(c echo.Context) error {
-	companyID, err := uuid.Parse(c.QueryParam("company_id"))
+	companyID, err := utils.ResolveCompanyIDForManage(c, db, c.QueryParam("company_id"))
 	if err != nil {
-		userID, _ := utils.GetUser(c)
-		var user model.User
-		if err := db.First(&user, userID).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.String(http.StatusNotFound, `{"error":"user is not found"}`)
-			}
-			return c.String(http.StatusInternalServerError, err.Error())
+		if httpErr, ok := err.(*echo.HTTPError); ok {
+			return c.String(httpErr.Code, fmt.Sprint(httpErr.Message))
 		}
-		if user.CompanyID == uuid.Nil {
-			return c.String(http.StatusBadRequest, `{"error":"company not found"}`)
-		}
-		fmt.Println("jwt userID", userID, "user.CompanyID", user.CompanyID)
-		companyID = user.CompanyID
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
+
 	// get company
 	var company model.Company
 	if err := db.Preload("AccreditationLimits").Preload("GateLimits").Preload("EventLimits").Preload("Members").First(&company, companyID).Error; err != nil {
@@ -199,20 +191,13 @@ func importMembers(c echo.Context) error {
 	if !utils.CheckUserWritePermission(c, db) {
 		return c.String(http.StatusBadRequest, "Ваш аккаунт работает в режиме только для чтения")
 	}
-	userID, userRole := utils.GetUser(c)
-	companyID, err := uuid.Parse(c.QueryParam("company_id"))
+	_, userRole := utils.GetUser(c)
+	companyID, err := utils.ResolveCompanyIDForManage(c, db, c.QueryParam("company_id"))
 	if err != nil {
-		var user model.User
-		if err := db.First(&user, userID).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.String(http.StatusNotFound, `{"error":"user is not found"}`)
-			}
-			return c.String(http.StatusInternalServerError, err.Error())
+		if httpErr, ok := err.(*echo.HTTPError); ok {
+			return c.String(httpErr.Code, fmt.Sprint(httpErr.Message))
 		}
-		if user.CompanyID == uuid.Nil {
-			return c.String(http.StatusBadRequest, `{"error":"company not found"}`)
-		}
-		companyID = user.CompanyID
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
 
 	// Get the uploaded file from the request

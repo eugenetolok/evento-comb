@@ -3,6 +3,7 @@ package evento
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/eugenetolok/evento/internal/evento/accreditation"
 	"github.com/eugenetolok/evento/internal/evento/auto"
@@ -17,6 +18,8 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	echojwt "github.com/labstack/echo-jwt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/time/rate"
 )
 
 func Routes(e *echo.Echo) {
@@ -31,8 +34,25 @@ func Routes(e *echo.Echo) {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid or expired JWT")
 		},
 	}
+	authLimiter := middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
+		Store: middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
+			Rate:      rate.Limit(appSettings.SiteSettings.AuthRateLimitRPS),
+			Burst:     appSettings.SiteSettings.AuthRateLimitBurst,
+			ExpiresIn: 3 * time.Minute,
+		}),
+		IdentifierExtractor: func(c echo.Context) (string, error) {
+			return c.RealIP(), nil
+		},
+		DenyHandler: func(c echo.Context, _ string, _ error) error {
+			return c.JSON(http.StatusTooManyRequests, map[string]string{
+				"error": "too many login attempts, please retry later",
+			})
+		},
+	})
+
 	e.GET("/api/settings/frontend", frontendConfig)
-	e.POST("/api/auth", authUser)
+	e.POST("/api/auth", authUser, authLimiter)
+	e.POST("/api/auth/reset-password", user.CompleteResetPassword, authLimiter)
 	// Restricted group
 	// r := e.Group("/api/users", utils.RoleMiddleware([]string{"admin", "editor"}))
 	// r.Use(echojwt.WithConfig(jwtConfig))

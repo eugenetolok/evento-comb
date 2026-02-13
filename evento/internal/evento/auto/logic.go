@@ -58,6 +58,7 @@ func getCompanyAutos(c echo.Context) error {
 }
 
 func givePass(c echo.Context) error {
+	utils.MarkDeprecatedGet(c, "POST")
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, `{"error":"invalid id"}`)
@@ -77,6 +78,7 @@ func givePass(c echo.Context) error {
 }
 
 func givePass2(c echo.Context) error {
+	utils.MarkDeprecatedGet(c, "POST")
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, `{"error":"invalid id"}`)

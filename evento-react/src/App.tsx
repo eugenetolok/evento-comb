@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useParams } from "react-router-dom";
 
 import DashboardLayout from "@/app/dashboard/layout";
 import LoginPage from "@/app/login/page";
+import ResetPasswordPage from "@/app/reset-password/page";
 import DashboardPage from "@/app/dashboard/page";
 import ToReadPage from "@/app/dashboard/toread/page";
 
@@ -58,6 +59,7 @@ function App() {
   return (
     <Routes>
       <Route element={<LoginPage />} path="/login" />
+      <Route element={<ResetPasswordPage />} path="/reset-password" />
 
       <Route
         element={

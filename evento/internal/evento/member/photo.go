@@ -165,6 +165,16 @@ func serveMemberPhoto(c echo.Context) error {
 	if member.PhotoFilename == "" {
 		return c.String(http.StatusNotFound, `Фото не найдено`)
 	}
+	var company model.Company
+	if err := db.Preload("User").First(&company, member.CompanyID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.String(http.StatusNotFound, `ID компании неверный`)
+		}
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	if !utils.CheckCompanyGetPermission(c, company) {
+		return c.String(http.StatusForbidden, `У пользователя недостаточно привелегий`)
+	}
 
 	fullPath := filepath.Join(memberPhotoDir, member.PhotoFilename)
 

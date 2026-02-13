@@ -2,6 +2,7 @@ package company
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/eugenetolok/evento/pkg/model"
@@ -12,15 +13,22 @@ import (
 )
 
 func getCompanyAutos(c echo.Context) error {
-	id := c.Param("id")
+	companyID, err := utils.ResolveCompanyIDForManage(c, db, c.QueryParam("company_id"))
+	if err != nil {
+		if httpErr, ok := err.(*echo.HTTPError); ok {
+			return c.String(httpErr.Code, fmt.Sprint(httpErr.Message))
+		}
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+
 	var company model.Company
-	if err := db.Preload("Autos").First(&company, id).Error; err != nil {
+	if err := db.Preload("Autos").First(&company, companyID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.String(http.StatusNotFound, `{"error":"company is not found"}`)
 		}
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, company.Members)
+	return c.JSON(http.StatusOK, company.Autos)
 }
 
 func checkRole(c echo.Context, company model.Company, editRequest bool) bool {
@@ -54,6 +62,7 @@ func getMyCompany(c echo.Context) error {
 }
 
 func freezeCompany(c echo.Context) error {
+	utils.MarkDeprecatedGet(c, "POST")
 	if !utils.CheckUserWritePermission(c, db) {
 		return c.String(http.StatusBadRequest, "Ваш аккаунт работает в режиме только для чтения")
 	}

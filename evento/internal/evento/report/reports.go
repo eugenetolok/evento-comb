@@ -86,14 +86,12 @@ func allUsers(c echo.Context) error {
 	// Add headers with styles
 	row := sheet.AddRow()
 	addHeaderCell(row, "Логин", headerStyle)
-	addHeaderCell(row, "Пароль", headerStyle)
 	addHeaderCell(row, "Роль", headerStyle)
 
 	// Add the company name and members to the sheet
 	for _, user := range users {
 		row = sheet.AddRow()
 		addCell(row, user.Username)
-		addCell(row, user.Password)
 		addCell(row, user.Role)
 	}
 
